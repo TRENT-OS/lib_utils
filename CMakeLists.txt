@@ -11,6 +11,11 @@ project(lib_util C)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
+target_sources(${PROJECT_NAME}
+    INTERFACE
+        "src/CharFifo.c"
+)
+
 target_include_directories(${PROJECT_NAME}
     INTERFACE
         "include"
