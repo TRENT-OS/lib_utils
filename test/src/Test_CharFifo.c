@@ -22,7 +22,8 @@ int clean_suite(void)
 }
 
 void test1()
-{   // test constructor
+{
+    // test constructor
     bool ok = CharFifo_ctor(&cf, FIFO_SIZE);
     CU_ASSERT(ok);
     ok = CharFifo_isEmpty(&cf);
@@ -38,7 +39,8 @@ void test1()
 }
 
 void test2()
-{   // test push within the limits
+{
+    // test push within the limits
     for (int i = 0; i < FIFO_SIZE; i++)
     {
         char c = (char) i;
@@ -52,7 +54,8 @@ void test2()
 }
 
 void test3()
-{   // test push behind the limits
+{
+    // test push behind the limits
     bool ok = !CharFifo_push(&cf, &c);
     CU_ASSERT(ok);
     ok = !CharFifo_isEmpty(&cf);
@@ -64,7 +67,8 @@ void test3()
 }
 
 void test4()
-{   // test get and pop
+{
+    // test get and pop
     for (int i = 0; i < FIFO_SIZE; i++)
     {
         char c = CharFifo_getAndPop(&cf);
@@ -86,7 +90,9 @@ int main()
 
     /* Initialize the CUnit test registry */
     if (CUE_SUCCESS != CU_initialize_registry())
+    {
         return CU_get_error();
+    }
 
     /* Add a suite to the registry */
     pSuite = CU_add_suite("seos_libs/LibUtil/CharFifo",
