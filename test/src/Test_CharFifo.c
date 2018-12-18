@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <CUnit/Basic.h>
 
-#include "LibUtil/CharFifo.h"
+#include "lib_util/CharFifo.h"
 /*
  * CUnit Test Suite
  */
