@@ -8,11 +8,13 @@
 
 
 //------------------------------------------------------------------------------
-static int is_buffer_in_buffer(const void* innerBuffer,
-                               size_t innerBufferLen,
-                               const void* outerBuffer,
-                               size_t outerBufferLen)
-{
+static __attribute__((__unused__))
+int is_buffer_in_buffer(
+    const void* innerBuffer,
+    size_t innerBufferLen,
+    const void* outerBuffer,
+    size_t outerBufferLen
+) {
     const void* innerBufferEnd = (const void*)( (uintptr_t)innerBuffer +
                                                 innerBufferLen);
     // cap buffer at end in case of overflow
@@ -36,11 +38,13 @@ static int is_buffer_in_buffer(const void* innerBuffer,
 
 
 //------------------------------------------------------------------------------
-static int is_buffer_content_equal(const void* buffer1,
-                                   size_t buffer1Len,
-                                   const void* buffer2,
-                                   size_t buffer2Len)
-{
+static __attribute__((__unused__))
+int is_buffer_content_equal(
+    const void* buffer1,
+    size_t buffer1Len,
+    const void* buffer2,
+    size_t buffer2Len
+) {
     // Note that memcmp() is not time invariant, it will stop on the first
     // mismatch. Thus this function is not suitable if comparing something
     // to sensitive data (e.g. a PIN, password ....).
@@ -61,10 +65,12 @@ typedef struct {
 } managedBuffer_t;
 
 //------------------------------------------------------------------------------
-static void managedBuffer_init(managedBuffer_t* managedBuffer,
-                              void* buffer,
-                              size_t bufferLen)
-{
+static __attribute__((__unused__))
+void managedBuffer_init(
+    managedBuffer_t* managedBuffer,
+    void* buffer,
+    size_t bufferLen
+) {
     Debug_ASSERT( NULL != buffer );
     // check that the buffer does no roll over memory boundaries
     Debug_ASSERT( (void*)( (uintptr_t)buffer + bufferLen) > buffer );
@@ -80,15 +86,19 @@ static void managedBuffer_init(managedBuffer_t* managedBuffer,
 
 
 //------------------------------------------------------------------------------
-static size_t managedBuffer_getFreeSpace(managedBuffer_t* managedBuffer)
-{
+static __attribute__((__unused__))
+size_t managedBuffer_getFreeSpace(
+    managedBuffer_t* managedBuffer
+) {
     return managedBuffer->len - managedBuffer->usedLen;
 }
 
 
 //------------------------------------------------------------------------------
-static void* managedBuffer_getFreeSpacePtr(managedBuffer_t* managedBuffer)
-{
+static __attribute__((__unused__))
+void* managedBuffer_getFreeSpacePtr(
+    managedBuffer_t* managedBuffer
+) {
     // there is an assert in managedBuffer_init() that ensure the buffer is
     // does not roll over memory boundaries, so this addition is safe if nobody
     // tampers with the internals.
@@ -97,9 +107,11 @@ static void* managedBuffer_getFreeSpacePtr(managedBuffer_t* managedBuffer)
 
 
 //------------------------------------------------------------------------------
-static int managedBuffer_reserveSpace(managedBuffer_t* managedBuffer,
-                                        size_t len)
-{
+static __attribute__((__unused__))
+int managedBuffer_reserveSpace(
+    managedBuffer_t* managedBuffer,
+    size_t len
+) {
     if (managedBuffer_getFreeSpace(managedBuffer) < len)
     {
         return -1;
@@ -112,10 +124,12 @@ static int managedBuffer_reserveSpace(managedBuffer_t* managedBuffer,
 
 
 //------------------------------------------------------------------------------
-static int managedBuffer_append(managedBuffer_t* managedBuffer,
-                                void* buffer,
-                                size_t bufferLen)
-{
+static __attribute__((__unused__))
+int managedBuffer_append(
+    managedBuffer_t* managedBuffer,
+    void* buffer,
+    size_t bufferLen
+) {
     Debug_ASSERT( NULL != buffer );
 
     if (managedBuffer_getFreeSpace(managedBuffer) < bufferLen)
@@ -133,9 +147,11 @@ static int managedBuffer_append(managedBuffer_t* managedBuffer,
 
 
 //------------------------------------------------------------------------------
-static int managedBuffer_appendChar(managedBuffer_t* managedBuffer,
-                                    char c)
-{
+static __attribute__((__unused__))
+int managedBuffer_appendChar(
+    managedBuffer_t* managedBuffer,
+    char c
+) {
     if (managedBuffer_getFreeSpace(managedBuffer) < 1)
     {
         return -1;
