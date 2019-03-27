@@ -12,7 +12,6 @@
 #if !defined(FIFOT_H)
 #define FIFOT_H
 
-#include "lib_mem/Memory.h"
 #include "lib_debug/Debug.h"
 
 #include <stdbool.h>
@@ -53,7 +52,10 @@ struct {                                                                    \
  * The constructor initializes an empty fifo of the given size.
  *
  * @param self a pointer to the container itself.
- * @param capacity the maximum number of elements that the fifo can hold.
+ * @param buffer a pointer to the memory buffer. Must be at the least
+ * sizeof(T__) * capacity bytes big.
+ * @param capacity the maximum number of elements that the fifo can hold in its
+ * memory buffer.
  * @return false if the constructor is unable to reserve enough dynamic memory
  *         for the container.
  *
@@ -61,7 +63,7 @@ struct {                                                                    \
  */
 
 #define FifoT_CTOR_DECL(T__, N__, SIZE_T__)                                 \
-    bool N__##_ctor(N__* self, SIZE_T__ capacity)
+    bool N__##_ctor(N__* self, void* buffer, SIZE_T__ capacity)
 
 /**
  * Destructor. Releases all the resources allocated by the fifo. Referenced
@@ -226,9 +228,12 @@ N__##_constApply(N__ const* self, N__##_applyFn fn, void* context)
 
 #define FifoT_CTOR_IMPL(T__,N__, SIZE_T__)                                  \
 bool N__##_ctor(N__* self,                                                  \
+                void*    buffer,                                            \
                 SIZE_T__ capacity)                                          \
 {                                                                           \
-    self->fifo = Memory_alloc(sizeof(T__) * capacity);                      \
+    Debug_ASSERT_SELF(self);                                                \
+                                                                            \
+    self->fifo = buffer;                                                    \
                                                                             \
     if (self->fifo == NULL)                                                 \
     {                                                                       \
@@ -247,7 +252,6 @@ void                                                                        \
 N__##_dtor(N__* self)                                                       \
 {                                                                           \
     N__##_clear(self);                                                      \
-    Memory_free(self->fifo);                                                \
 }
 
 #define FifoT_ISEMPTY_IMPL(T__, N__)                                        \
