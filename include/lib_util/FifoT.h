@@ -1,5 +1,5 @@
 /**
- * @addtogroup Commons
+ * @addtogroup LibUtil
  * @{
  * @file FifoT.h
  *
