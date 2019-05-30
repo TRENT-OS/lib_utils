@@ -257,8 +257,18 @@ void N##_clear(N* v)
     }                                                                       \
     while(0)
 
-#define VectorT_DEFINE(T, N, SIZE_T)                                        \
-                                                                            \
+#if defined(Memory_Config_STATIC)
+#   define VectorT_DEFINE_CTOR(T, N, SIZE_T)
+#   define VectorT_DEFINE_CTOR_COPY(T, N, SIZE_T)
+#   define VectorT_DEFINE_NEW(T, N, SIZE_T)
+#   define VectorT_DEFINE_DEL(T, N, SIZE_T)
+#   define VectorT_DEFINE_RESIZE_IF_NEEDED(T, N, SIZE_T)                    \
+    bool N##_resizeIfNeeded(N* v)                                           \
+    {                                                                       \
+        return (v->nextFree_ < v->size_)                                    \
+    }
+#else
+#   define VectorT_DEFINE_CTOR(T, N, SIZE_T)                                \
     bool N##_ctor(N* v, SIZE_T defaultSize)                                 \
     {                                                                       \
         v->vector_ = Memory_alloc(sizeof(T) * defaultSize);                 \
@@ -270,21 +280,8 @@ void N##_clear(N* v)
         v->nextFree_    = 0;                                                \
         v->isStatic_    = false;                                            \
         return true;                                                        \
-    }                                                                       \
-                                                                            \
-    bool N##_ctorStatic(N* v, void* buffer, SIZE_T defaultSize)             \
-    {                                                                       \
-        v->vector_ = buffer;                                                \
-        if (v->vector_ == NULL)                                             \
-        {                                                                   \
-            return false;                                                   \
-        }                                                                   \
-        v->size_        = defaultSize;                                      \
-        v->nextFree_    = 0;                                                \
-        v->isStatic_    = true;                                             \
-        return true;                                                        \
-    }                                                                       \
-                                                                            \
+    }
+#   define VectorT_DEFINE_CTOR_COPY(T, N, SIZE_T)                           \
     bool N##_ctorCopy(N* v, N const* s)                                     \
     {                                                                       \
         v->vector_ = Memory_alloc(s->size_ * sizeof(T));                    \
@@ -309,20 +306,8 @@ void N##_clear(N* v)
             }                                                               \
         }                                                                   \
         return true;                                                        \
-    }                                                                       \
-                                                                            \
-    void N##_dtor(N* v)                                                     \
-    {                                                                       \
-        for (SIZE_T i = 0; i < v->nextFree_; ++i)                           \
-        {                                                                   \
-            T##_dtor(&v->vector_[i]);                                       \
-        }                                                                   \
-        if (!v->isStatic)                                                   \
-        {                                                                   \
-            Memory_free(v->vector_);                                        \
-        }                                                                   \
-    }                                                                       \
-                                                                            \
+    }
+#   define VectorT_DEFINE_NEW(T, N, SIZE_T)                                 \
     N* N##_new(SIZE_T defaultSize)                                          \
     {                                                                       \
         N* object = Memory_alloc(sizeof(N));                                \
@@ -336,8 +321,8 @@ void N##_clear(N* v)
             }                                                               \
         }                                                                   \
         return object;                                                      \
-    }                                                                       \
-                                                                            \
+    }
+#   define VectorT_DEFINE_DEL(T, N, SIZE_T)                                 \
     void N##_del(N* v)                                                      \
     {                                                                       \
         if (v)                                                              \
@@ -345,8 +330,8 @@ void N##_clear(N* v)
             N##_dtor(v);                                                    \
             Memory_free(v);                                                 \
         }                                                                   \
-    }                                                                       \
-                                                                            \
+    }
+#   define VectorT_DEFINE_RESIZE_IF_NEEDED(T, N, SIZE_T)                    \
     bool N##_resizeIfNeeded(N* v)                                           \
     {                                                                       \
         bool retval = false;                                                \
@@ -392,7 +377,43 @@ void N##_clear(N* v)
             }                                                               \
         }                                                                   \
         return retval;                                                      \
+    }
+#endif
+
+#define VectorT_DEFINE(T, N, SIZE_T)                                        \
+                                                                            \
+    VectorT_DEFINE_CTOR(T, N, SIZE_T)                                       \
+                                                                            \
+    bool N##_ctorStatic(N* v, void* buffer, SIZE_T defaultSize)             \
+    {                                                                       \
+        v->vector_ = buffer;                                                \
+        if (v->vector_ == NULL)                                             \
+        {                                                                   \
+            return false;                                                   \
+        }                                                                   \
+        v->size_        = defaultSize;                                      \
+        v->nextFree_    = 0;                                                \
+        v->isStatic_    = true;                                             \
+        return true;                                                        \
     }                                                                       \
+                                                                            \
+    VectorT_DEFINE_CTOR_COPY(T, N, SIZE_T)                                  \
+                                                                            \
+    void N##_dtor(N* v)                                                     \
+    {                                                                       \
+        for (SIZE_T i = 0; i < v->nextFree_; ++i)                           \
+        {                                                                   \
+            T##_dtor(&v->vector_[i]);                                       \
+        }                                                                   \
+        if (!v->isStatic)                                                   \
+        {                                                                   \
+            Memory_free(v->vector_);                                        \
+        }                                                                   \
+    }                                                                       \
+                                                                            \
+    VectorT_DEFINE_NEW(T, N, SIZE_T)                                        \
+                                                                            \
+    VectorT_DEFINE_DEL(T, N, SIZE_T)                                        \
                                                                             \
     bool N##_pushBackByPtr(N* v, T const* item)                             \
     {                                                                       \
