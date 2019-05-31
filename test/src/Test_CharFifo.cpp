@@ -21,9 +21,11 @@ class Test_CharFifo : public testing::Test
     protected:
 };
 
+static char fifoBuff[FIFO_SIZE];
+
 TEST(Test_CharFifo, construction)
 {
-    bool ok = CharFifo_ctor(&cf, FIFO_SIZE);
+    bool ok = CharFifo_ctor(&cf, fifoBuff, FIFO_SIZE);
     ASSERT_TRUE(ok);
     ok = CharFifo_isEmpty(&cf);
     ASSERT_TRUE(ok);

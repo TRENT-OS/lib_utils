@@ -21,10 +21,12 @@ int clean_suite(void)
     return 0;
 }
 
+static char fifoBuff[FIFO_SIZE];
+
 void test1()
 {
     // test constructor
-    bool ok = CharFifo_ctor(&cf, FIFO_SIZE);
+    bool ok = CharFifo_ctor(&cf, fifoBuff, FIFO_SIZE);
     CU_ASSERT(ok);
     ok = CharFifo_isEmpty(&cf);
     CU_ASSERT(ok);
