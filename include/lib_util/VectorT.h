@@ -66,7 +66,8 @@ T const* N##_getPtrToElementAt(N const* v, SIZE_T n);                       \
 bool N##_replaceElementAt(N* v, SIZE_T n, T newElement);                    \
 SIZE_T N##_getSize(N const* v);                                             \
 bool N##_isEmpty(N const* v);                                               \
-void N##_clear(N* v)
+void N##_clear(N* v);                                                       \
+bool N##_resizeIfNeeded(N* v)
 
 /**
  * @fn bool VectorT_ctor( VectorT* v )
@@ -340,7 +341,7 @@ void N##_clear(N* v)
         {                                                                   \
             retval = true;                                                  \
         }                                                                   \
-        else if (v->isStatic)                                               \
+        else if (v->isStatic_)                                              \
         {                                                                   \
             retval = false;                                                 \
         }                                                                   \
@@ -405,7 +406,7 @@ void N##_clear(N* v)
         {                                                                   \
             T##_dtor(&v->vector_[i]);                                       \
         }                                                                   \
-        if (!v->isStatic)                                                   \
+        if (!v->isStatic_)                                                  \
         {                                                                   \
             Memory_free(v->vector_);                                        \
         }                                                                   \
@@ -541,7 +542,8 @@ void N##_clear(N* v)
             T##_dtor(&v->vector_[i]);                                       \
         }                                                                   \
         v->nextFree_ = 0;                                                   \
-    }
+    }                                                                       \
+    VectorT_DEFINE_RESIZE_IF_NEEDED(T, N, SIZE_T)
 
 #if defined(__cplusplus)
 }
