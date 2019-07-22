@@ -14,6 +14,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 target_sources(${PROJECT_NAME}
     INTERFACE
         "src/CharFifo.c"
+        "src/PointerVector.c"
 )
 
 target_include_directories(${PROJECT_NAME}
