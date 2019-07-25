@@ -1,11 +1,12 @@
 /**
  * @addtogroup LibUtil
  * @{
- * @file VectorT.h
- * @author
  *
- * @notes
- * @history
+ * @file VectorT.h
+ *
+ * @brief Vector container template
+ *
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
  */
 #if !defined(VECTORT_H)

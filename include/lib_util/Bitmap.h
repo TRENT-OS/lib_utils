@@ -6,9 +6,6 @@
  *
  * @brief Simple bitmap management : Bit Index start from 0.
  *
- *
- * @author Carmelo Pintaudi
- *
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 

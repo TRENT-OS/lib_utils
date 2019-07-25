@@ -1,12 +1,12 @@
 /**
  * @addtogroup LibUtil
  * @{
+ *
  * @file FifoT.h
  *
- * @author
+ * @brief Fifo container template
  *
- * @notes
- * @history
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
  */
 #if !defined(FIFOT_H)

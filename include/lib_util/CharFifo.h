@@ -4,14 +4,10 @@
  *
  * @file CharFifo.h
  *
+ * @brief Fifo class of chars based on FifoT.h template
  *
- *
- * @author fw team
- * @version 1.0
- * @date 01/10/2010
- *
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
-
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
