@@ -76,3 +76,4 @@ CharFifo_getAndPop(CharFifo* self)
 
 /* Private Functions -------------------------------------------------------- */
 
+///@}

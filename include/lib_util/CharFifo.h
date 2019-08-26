@@ -42,3 +42,4 @@ CharFifo_forcedPush(CharFifo* self, char const* c);
 
 #endif /* <HEADER_UNIQUE_SYMBOL_H> */
 
+///@}

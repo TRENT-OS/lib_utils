@@ -52,3 +52,5 @@ typedef int      volatile  BitMapInt;
 /* Exported functions ------------------------------------------------------- */
 
 #endif /* BITMAP_H */
+
+///@}

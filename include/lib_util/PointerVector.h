@@ -20,3 +20,5 @@ bool Pointer_ctorMove(Pointer* dst, Pointer const* src);
 bool Pointer_assign(Pointer* dst, Pointer const* src);
 
 VectorT_DECLARE(Pointer, PointerVector, size_t);
+
+///@}
