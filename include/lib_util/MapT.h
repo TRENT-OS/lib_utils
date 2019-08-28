@@ -31,6 +31,7 @@
  *
  * @code
  * bool K_ctorCopy(K* target, K const* source);
+ * bool K_ctorMove(K* target, K const* source);
  * bool K_assign(K* target, K const* source);
  * void K_dtor(K* object);
  * bool K_isEqual(K* a, K* b);
@@ -52,6 +53,7 @@
  *
  * @code
  * bool V_ctorCopy(V* target, V const* source);
+ * bool V_ctorMove(V* target, V const* source);
  * bool V_assign(V* target, V const* source);
  * void V_dtor(V* object);
  * @endcode
@@ -82,7 +84,7 @@
     (sizeof(N__##_Item) * numItems)
 
 /**
- * @fn bool MapT_ctor(MapT* self, site_t capacity)
+ * @fn bool MapT_ctor(MapT* self, size_t capacity)
  *
  * Container constructor. If the object is properly constructed you have to
  * destroy it when you no longer need it via a call to #MapT_dtor().
@@ -96,10 +98,10 @@
  * @retval false the construction failed.
  */
 #define MapT_CTOR_DECL(K__,V__,N__)          \
-    bool N__##_ctor(N__* self, site_t capacity)
+    bool N__##_ctor(N__* self, size_t capacity)
 
 /**
- * @fn bool MapT_ctorStatic(MapT* self, void* buffer, site_t capacity)
+ * @fn bool MapT_ctorStatic(MapT* self, void* buffer, size_t capacity)
  *
  * Container constructor. If the object is properly constructed you have to
  * destroy it when you no longer need it via a call to #MapT_dtor().
@@ -327,7 +329,9 @@
                               N__##_Item const* orig);                      \
     bool N__##_Item_assign(N__##_Item* self,                                \
                             N__##_Item const* orig);                        \
-    DECLARE_VectorT(N__##_Item, N__##_Impl);                                \
+    bool N__##_Item_ctorMove(N__##_Item* self,                              \
+                            N__##_Item const* orig);                        \
+    VectorT_DECLARE(N__##_Item, N__##_Impl, size_t);                        \
     typedef struct                                                          \
     {                                                                       \
         N__##_Impl mapImpl;                                                 \
@@ -358,7 +362,7 @@
 
 #define MapT_CTOR_STATIC_IMPL(K__,V__,N__)                                  \
     bool                                                                    \
-    N__##_ctor(N__* self, void* buffer, size_t capacity)                    \
+    N__##_ctorStatic(N__* self, void* buffer, size_t capacity)                    \
     {                                                                       \
         return N__##_Impl_ctorStatic(&self->mapImpl, buffer, capacity);     \
     }
@@ -396,9 +400,9 @@
 #define MapT_REMOVEAT_IMPL(K__,V__,N__)                                     \
     void N__##_removeAt(N__* self, int index)                               \
     {                                                                       \
-        MRDUTL_ASSERT(index >= 0);                                          \
+        Debug_ASSERT(index >= 0);                                          \
         int size = N__##_Impl_getSize(&self->mapImpl);                      \
-        MRDUTL_ASSERT(index < size);                                        \
+        Debug_ASSERT(index < size);                                        \
         if (index !=  size-1)                                               \
         {                                                                   \
             N__##_Item tmp = N__##_Impl_getElementAt(&self->mapImpl, size-1);\
@@ -447,7 +451,7 @@
     {                                                                       \
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
-        MRDUTL_ASSERT(item >= 0);                                           \
+        Debug_ASSERT(item >= 0);                                           \
         return &item->value;                                                \
     }
 
@@ -458,7 +462,7 @@
     {                                                                       \
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
-        MRDUTL_ASSERT(item >= 0);                                           \
+        Debug_ASSERT(item >= 0);                                           \
         N__##_Item newItem;                                                 \
         if (K__##_ctorCopy(&newItem.key, &item->key))                       \
         {                                                                   \
@@ -480,7 +484,7 @@
 #define MapT_GETKEYAT_IMPL(K__, V__, N__)                                   \
     K__ const* N__##_getKeyAt(N__ const* self, int index)                   \
     {                                                                       \
-        MRDUTL_ASSERT(index >= 0);                                          \
+        Debug_ASSERT(index >= 0);                                          \
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
         return &item->key;                                                  \
@@ -531,6 +535,20 @@
         return true;                                                        \
     }
 
+#define MapT_Item_ctorMove_IMPL(K__,V__,N__)                                \
+    bool N__##_Item_ctorMove(N__##_Item* self, N__##_Item const* src)       \
+    {                                                                       \
+        if (K__##_ctorMove(&self->key, &src->key))                          \
+        {                                                                   \
+            if (V__##_ctorMove(&self->value, &src->value))                  \
+            {                                                               \
+                return true;                                                \
+            }                                                               \
+            K__##_dtor(&self->key);                                         \
+        }                                                                   \
+        return false;                                                       \
+    }
+
 #define MapT_Item_dtor_IMPL(K__,V__,N__)                                    \
     void N__##_Item_dtor(N__##_Item* self)                                  \
     {                                                                       \
@@ -550,10 +568,11 @@
  */
 
 #define MapT_DEFINE(K__,V__,N__)                \
-    DEFINE_VectorT(N__##_Item, N__##_Impl)      \
+    VectorT_DEFINE(N__##_Item, N__##_Impl, size_t)\
     MapT_Item_dtor_IMPL(K__,V__,N__)            \
     MapT_Item_ctorCopy_IMPL(K__,V__,N__)        \
     MapT_Item_assign_IMPL(K__,V__,N__)          \
+    MapT_Item_ctorMove_IMPL(K__,V__,N__)        \
     MapT_CTOR_IMPL(K__,V__,N__)                 \
     MapT_CTOR_STATIC_IMPL(K__,V__,N__)          \
     MapT_CTOR_COPY_IMPL(K__,V__,N__)	        \

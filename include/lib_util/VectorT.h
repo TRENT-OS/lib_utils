@@ -361,6 +361,7 @@ bool N##_resizeIfNeeded(N* v)
             else                                                            \
             {                                                               \
                 SIZE_T i = 0;                                               \
+                retval = true;                                              \
                                                                             \
                 for (; i < v->size_ && retval; ++i)                         \
                 {                                                           \
@@ -374,8 +375,6 @@ bool N##_resizeIfNeeded(N* v)
                 Memory_free(v->vector_);                                    \
                 v->vector_  = newVector;                                    \
                 v->size_    = newSize;                                      \
-                                                                            \
-                retval = true;                                              \
             }                                                               \
         }                                                                   \
         return retval;                                                      \
