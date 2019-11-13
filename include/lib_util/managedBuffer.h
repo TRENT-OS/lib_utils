@@ -6,6 +6,33 @@
 
 #pragma once
 
+#include <stdint.h>
+
+//------------------------------------------------------------------------------
+static bool
+do_buffers_overlap(
+    const void* buffer1,
+    size_t buffer1Len,
+    const void* buffer2,
+    size_t buffer2Len)
+{
+    if (buffer1 == buffer2)
+    {
+        return true;
+    }
+
+    if (buffer1 < buffer2 && buffer1 + buffer1Len > buffer2)
+    {
+        return true;
+    }
+
+    if (buffer2 < buffer1 && buffer2 + buffer2Len > buffer1)
+    {
+        return true;
+    }
+
+    return false;
+}
 
 //------------------------------------------------------------------------------
 static __attribute__((__unused__))
@@ -14,7 +41,8 @@ int is_buffer_in_buffer(
     size_t innerBufferLen,
     const void* outerBuffer,
     size_t outerBufferLen
-) {
+)
+{
     const void* innerBufferEnd = (const void*)( (uintptr_t)innerBuffer +
                                                 innerBufferLen);
     // cap buffer at end in case of overflow
@@ -44,12 +72,13 @@ int is_buffer_content_equal(
     size_t buffer1Len,
     const void* buffer2,
     size_t buffer2Len
-) {
+)
+{
     // Note that memcmp() is not time invariant, it will stop on the first
     // mismatch. Thus this function is not suitable if comparing something
     // to sensitive data (e.g. a PIN, password ....).
     return ( (buffer1Len == buffer2Len)
-             && (0 == memcmp(buffer1, buffer2,buffer1Len)) );
+             && (0 == memcmp(buffer1, buffer2, buffer1Len)) );
 }
 
 
@@ -58,10 +87,11 @@ int is_buffer_content_equal(
 //------------------------------------------------------------------------------
 
 
-typedef struct {
-        void*   buffer;
-        size_t  len;
-        size_t  usedLen;
+typedef struct
+{
+    void*   buffer;
+    size_t  len;
+    size_t  usedLen;
 } managedBuffer_t;
 
 //------------------------------------------------------------------------------
@@ -70,7 +100,8 @@ void managedBuffer_init(
     managedBuffer_t* managedBuffer,
     void* buffer,
     size_t bufferLen
-) {
+)
+{
     Debug_ASSERT( NULL != buffer );
     // check that the buffer does no roll over memory boundaries
     Debug_ASSERT( (void*)( (uintptr_t)buffer + bufferLen) > buffer );
@@ -89,7 +120,8 @@ void managedBuffer_init(
 static __attribute__((__unused__))
 size_t managedBuffer_getFreeSpace(
     managedBuffer_t* managedBuffer
-) {
+)
+{
     return managedBuffer->len - managedBuffer->usedLen;
 }
 
@@ -98,7 +130,8 @@ size_t managedBuffer_getFreeSpace(
 static __attribute__((__unused__))
 void* managedBuffer_getFreeSpacePtr(
     managedBuffer_t* managedBuffer
-) {
+)
+{
     // there is an assert in managedBuffer_init() that ensure the buffer is
     // does not roll over memory boundaries, so this addition is safe if nobody
     // tampers with the internals.
@@ -111,7 +144,8 @@ static __attribute__((__unused__))
 int managedBuffer_reserveSpace(
     managedBuffer_t* managedBuffer,
     size_t len
-) {
+)
+{
     if (managedBuffer_getFreeSpace(managedBuffer) < len)
     {
         return -1;
@@ -129,7 +163,8 @@ int managedBuffer_append(
     managedBuffer_t* managedBuffer,
     void* buffer,
     size_t bufferLen
-) {
+)
+{
     Debug_ASSERT( NULL != buffer );
 
     if (managedBuffer_getFreeSpace(managedBuffer) < bufferLen)
@@ -151,7 +186,8 @@ static __attribute__((__unused__))
 int managedBuffer_appendChar(
     managedBuffer_t* managedBuffer,
     char c
-) {
+)
+{
     if (managedBuffer_getFreeSpace(managedBuffer) < 1)
     {
         return -1;
