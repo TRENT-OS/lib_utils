@@ -9,8 +9,8 @@
 #include <stdint.h>
 
 //------------------------------------------------------------------------------
-static bool
-do_buffers_overlap(
+static __attribute__((__unused__))
+bool do_buffers_overlap(
     const void* buffer1,
     size_t buffer1Len,
     const void* buffer2,
