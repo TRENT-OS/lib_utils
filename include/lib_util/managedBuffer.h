@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
 //------------------------------------------------------------------------------
 static __attribute__((__unused__))
