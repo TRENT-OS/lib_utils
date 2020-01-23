@@ -16,12 +16,14 @@
 extern "C" {
 #endif
 
-#include "lib_mem/Memory.h"
-#include "lib_debug/Debug.h"
+// #include "lib_mem/Memory.h"
+// #include "lib_debug/Debug.h"
 
-#include <stdbool.h>
+/* #include <stdbool.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <limits.h> */
+
+#define bool _Bool
 
 #if !defined(Vector_MAX_SIZE)
 #define Vector_MAX_SIZE INT_MAX
@@ -55,8 +57,8 @@ bool N##_ctorCopy(N* v, N const* s);                                        \
 void N##_dtor(N* v);                                                        \
 N* N##_new(SIZE_T defaultSize);                                             \
 void N##_del(N* v);                                                         \
-bool N##_pushBack(N* v, T);                                                 \
-bool N##_pushBackMove(N* v, T);                                             \
+/* bool N##_pushBack(N* v, T); */                                           \
+bool N##_pushBackMove(N* v, T const*);                                      \
 bool N##_pushBackByPtr(N* v, T const*);                                     \
 bool N##_pushBackMoveByPtr(N* v, T const*);                                 \
 T N##_getFront(N const* v);                                                 \
@@ -64,7 +66,7 @@ T N##_getBack(N const* v);                                                  \
 void N##_popBack(N* v);                                                     \
 T N##_getElementAt(N const* v, SIZE_T n);                                   \
 T const* N##_getPtrToElementAt(N const* v, SIZE_T n);                       \
-bool N##_replaceElementAt(N* v, SIZE_T n, T newElement);                    \
+bool N##_replaceElementAt(N* v, SIZE_T n, T const *newElement);             \
 SIZE_T N##_getSize(N const* v);                                             \
 bool N##_isEmpty(N const* v);                                               \
 void N##_clear(N* v);                                                       \
@@ -202,14 +204,15 @@ bool N##_resizeIfNeeded(N* v)
  */
 
 /**
- * @fn bool VectorT_replaceElementAt( VectorT* v, int n, T newElement )
+ * @fn bool VectorT_replaceElementAt( VectorT* v, int n, T const *newElement )
  *
  * Replace the element at the given position.
  *
  * @param v a pointer to the vector.
  * @param n the position you want to replace. It is an error to specify a non
  *          existing position or an invalid index (negative).
- * @param newElement the new value to assign to the element at position n.
+ * @param newElement a pointer to the new value to assign to the element at
+ *                   position n.
  * @retval true the operation has been successfully completed.
  * @retval false the operation failed.
  */
@@ -252,7 +255,7 @@ bool N##_resizeIfNeeded(N* v)
         Debug_ASSERT(v__->vector_ != NULL);                                 \
         Debug_ASSERT(v__->nextFree_ >= 0);                                  \
         Debug_ASSERT(v__->size >= v__->nextFree_);                          \
-        for (SIZE_T i = 0; i < v__->nextFree_; ++i)                         \
+        for (SIZE_T i = 0; i < v__->nextFree_; i++)                         \
         {                                                                   \
             T__##_ASSERTInvariants(&v__->vector_[i]);                       \
         }                                                                   \
@@ -262,12 +265,20 @@ bool N##_resizeIfNeeded(N* v)
 #if defined(Memory_Config_STATIC)
 #   define VectorT_DEFINE_CTOR(T, N, SIZE_T)
 #   define VectorT_DEFINE_CTOR_COPY(T, N, SIZE_T)
+#	  define VectorT_DEFINE_DTOR(T, N, SIZE_T)                                \
+    void N##_dtor(N* v)                                                     \
+    {                                                                       \
+        for (SIZE_T i = 0; i < v->nextFree_; i++)                           \
+        {                                                                   \
+            T##_dtor(&v->vector_[i]);                                       \
+        }                                                                   \
+    }
 #   define VectorT_DEFINE_NEW(T, N, SIZE_T)
 #   define VectorT_DEFINE_DEL(T, N, SIZE_T)
 #   define VectorT_DEFINE_RESIZE_IF_NEEDED(T, N, SIZE_T)                    \
     bool N##_resizeIfNeeded(N* v)                                           \
     {                                                                       \
-        return (v->nextFree_ < v->size_)                                    \
+        return (v->nextFree_ < v->size_);                                   \
     }
 #else
 #   define VectorT_DEFINE_CTOR(T, N, SIZE_T)                                \
@@ -294,12 +305,12 @@ bool N##_resizeIfNeeded(N* v)
         v->size_ = s->size_;                                                \
         v->nextFree_ = s->nextFree_;                                        \
                                                                             \
-        for (SIZE_T i = 0; i < v->nextFree_; ++i)                           \
+        for (SIZE_T i = 0; i < v->nextFree_; i++)                           \
         {                                                                   \
             if (!T##_ctorCopy(&v->vector_[i], &s->vector_[i]))              \
             {                                                               \
                 /* rollback */                                              \
-                for (--i ; i>= 0; --i)                                      \
+                for (i = i - 1; i>= 0; i--)                                      \
                 {                                                           \
                     T##_dtor(&v->vector_[i]);                               \
                 }                                                           \
@@ -308,6 +319,18 @@ bool N##_resizeIfNeeded(N* v)
             }                                                               \
         }                                                                   \
         return true;                                                        \
+    }
+#	  define VectorT_DEFINE_DTOR(T, N, SIZE_T)                                \
+    void N##_dtor(N* v)                                                     \
+    {                                                                       \
+        for (SIZE_T i = 0; i < v->nextFree_; i++)                           \
+        {                                                                   \
+            T##_dtor(&v->vector_[i]);                                       \
+        }                                                                   \
+        if (!v->isStatic_)                                                  \
+        {                                                                   \
+            Memory_free(v->vector_);                                        \
+        }                                                                   \
     }
 #   define VectorT_DEFINE_NEW(T, N, SIZE_T)                                 \
     N* N##_new(SIZE_T defaultSize)                                          \
@@ -363,7 +386,7 @@ bool N##_resizeIfNeeded(N* v)
                 SIZE_T i = 0;                                               \
                 retval = true;                                              \
                                                                             \
-                for (; i < v->size_ && retval; ++i)                         \
+                for (; i < v->size_ && retval; i++)                         \
                 {                                                           \
                     retval = T##_ctorCopy(&newVector[i], &v->vector_[i]);   \
                     T##_dtor(&v->vector_[i]);                               \
@@ -400,17 +423,7 @@ bool N##_resizeIfNeeded(N* v)
                                                                             \
     VectorT_DEFINE_CTOR_COPY(T, N, SIZE_T)                                  \
                                                                             \
-    void N##_dtor(N* v)                                                     \
-    {                                                                       \
-        for (SIZE_T i = 0; i < v->nextFree_; ++i)                           \
-        {                                                                   \
-            T##_dtor(&v->vector_[i]);                                       \
-        }                                                                   \
-        if (!v->isStatic_)                                                  \
-        {                                                                   \
-            Memory_free(v->vector_);                                        \
-        }                                                                   \
-    }                                                                       \
+    VectorT_DEFINE_DTOR(T, N, SIZE_T)                                       \
                                                                             \
     VectorT_DEFINE_NEW(T, N, SIZE_T)                                        \
                                                                             \
@@ -432,7 +445,7 @@ bool N##_resizeIfNeeded(N* v)
         return retval;                                                      \
     }                                                                       \
                                                                             \
-    bool N##_pushBack(N* v, T item)                                         \
+    /* bool N##_pushBack(N* v, T item)                                      \
     {                                                                       \
         bool retval = true;                                                 \
                                                                             \
@@ -446,14 +459,14 @@ bool N##_resizeIfNeeded(N* v)
             retval = false;                                                 \
         }                                                                   \
         return retval;                                                      \
-    }                                                                       \
+    } */                                                                    \
                                                                             \
-    bool N##_pushBackMove(N* v, T item)                                     \
+    bool N##_pushBackMove(N* v, T const *item)                              \
     {                                                                       \
         bool retval = true;                                                 \
                                                                             \
         if (N##_resizeIfNeeded(v) &&                                        \
-            T##_ctorMove(&v->vector_[v->nextFree_], &item))                 \
+            T##_ctorMove(&v->vector_[v->nextFree_], item))                  \
         {                                                                   \
             v->nextFree_++;                                                 \
         }                                                                   \
@@ -485,32 +498,32 @@ bool N##_resizeIfNeeded(N* v)
         if (v->nextFree_ > 0)                                               \
         {                                                                   \
             T##_dtor(&v->vector_[v->nextFree_-1]);                          \
-            --v->nextFree_;                                                 \
+            v->nextFree_--;                                                 \
         }                                                                   \
     }                                                                       \
                                                                             \
+		T item_for_getFront;                                                    \
     T N##_getFront(N const* v)                                              \
     {                                                                       \
         Debug_ASSERT(v->nextFree_ > 0);                                     \
-        T item;                                                             \
-        T##_ctorCopy(&item, &v->vector_[0]);                                \
-        return item;                                                        \
+        T##_ctorCopy(&item_for_getFront, &v->vector_[0]);                   \
+        return item_for_getFront;                                           \
     }                                                                       \
                                                                             \
+		T item_for_getBack;                                                     \
     T N##_getBack(N const* v)                                               \
     {                                                                       \
         Debug_ASSERT(v->nextFree_ > 0);                                     \
-        T item;                                                             \
-        T##_ctorCopy(&item, &v->vector_[v->nextFree_-1]);                   \
-        return item;                                                        \
+        T##_ctorCopy(&item_for_getBack, &v->vector_[v->nextFree_-1]);       \
+        return item_for_getBack;                                            \
     }                                                                       \
                                                                             \
+		T item_for_getElementAt;                                                \
     T N##_getElementAt(N const* v, SIZE_T n)                                \
     {                                                                       \
         Debug_ASSERT(n >= 0 && n < v->nextFree_);                           \
-        T item;                                                             \
-        T##_ctorCopy(&item, &v->vector_[n]);                                \
-        return item;                                                        \
+        T##_ctorCopy(&item_for_getElementAt, &v->vector_[n]);               \
+        return item_for_getElementAt;                                       \
     }                                                                       \
                                                                             \
     T const* N##_getPtrToElementAt(N const* v, SIZE_T n)                    \
@@ -519,10 +532,10 @@ bool N##_resizeIfNeeded(N* v)
         return &v->vector_[n];                                              \
     }                                                                       \
                                                                             \
-    bool N##_replaceElementAt(N* v, SIZE_T n, T newElement)                 \
+    bool N##_replaceElementAt(N* v, SIZE_T n, T const *newElement)          \
     {                                                                       \
         Debug_ASSERT(n >= 0 && n < v->nextFree_);                           \
-        return T##_assign(&v->vector_[n], &newElement);                     \
+        return T##_assign(&v->vector_[n], newElement);                      \
     }                                                                       \
                                                                             \
     SIZE_T N##_getSize(N const* v)                                          \
@@ -537,7 +550,7 @@ bool N##_resizeIfNeeded(N* v)
                                                                             \
     void N##_clear(N* v)                                                    \
     {                                                                       \
-        for (SIZE_T i = 0; i < v->nextFree_; ++i)                           \
+        for (SIZE_T i = 0; i < v->nextFree_; i++)                           \
         {                                                                   \
             T##_dtor(&v->vector_[i]);                                       \
         }                                                                   \
@@ -555,13 +568,13 @@ bool VectorT_ctorCopy( VectorT* v, VectorT const* s );
 void VectorT_dtor( VectorT* v );
 VectorT* VectorT_new( void );
 void VectorT_delete( VectorT* v );
-bool VectorT_pushBack( VectorT* v, T item );
+/* bool VectorT_pushBack( VectorT* v, T item ); */
 T VectorT_getFront( VectorT const* v );
 T VectorT_getBack( VectorT const* v );
 void VectorT_popBack( VectorT* v );
 T VectorT_getElementAt( VectorT const* v, int n );
 T const* VectorT_getPtrToElementAt( VectorT const* v, int n );
-bool VectorT_replaceElementAt( VectorT* v, int n, T newElement );
+bool VectorT_replaceElementAt( VectorT* v, int n, T const *newElement );
 int VectorT_getSize( VectorT const* v );
 bool VectorT_isEmpty( VectorT const* v );
 void VectorT_clear( VectorT* v );

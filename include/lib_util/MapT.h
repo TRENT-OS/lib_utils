@@ -382,6 +382,7 @@
     }
 
 #define MapT_INSERT_IMPL(K__,V__,N__)                                       \
+		N__##_Item item_for_insert;                                             \
     bool N__##_insert(N__* self,                                            \
                        K__ const* key,                                      \
                        V__ const* value)                                    \
@@ -390,14 +391,14 @@
         {                                                                   \
             return false;                                                   \
         }                                                                   \
-        N__##_Item item;                                                    \
-        K__##_ctorCopy(&item.key, key);                                     \
-        V__##_ctorCopy(&item.value, value);                                 \
-        N__##_Impl_pushBack(&self->mapImpl, item);                          \
+        K__##_ctorCopy(&item_for_insert.key, key);                          \
+        V__##_ctorCopy(&item_for_insert.value, value);                      \
+        N__##_Impl_pushBackByPtr(&self->mapImpl, &item_for_insert);         \
         return true;                                                        \
     }
 
 #define MapT_REMOVEAT_IMPL(K__,V__,N__)                                     \
+		N__##_Item tmp_for_removeAt;                                          \
     void N__##_removeAt(N__* self, int index)                               \
     {                                                                       \
         Debug_ASSERT(index >= 0);                                          \
@@ -405,8 +406,8 @@
         Debug_ASSERT(index < size);                                        \
         if (index !=  size-1)                                               \
         {                                                                   \
-            N__##_Item tmp = N__##_Impl_getElementAt(&self->mapImpl, size-1);\
-            N__##_Impl_replaceElementAt(&self->mapImpl, index, tmp);        \
+            tmp_for_removeAt = N__##_Impl_getElementAt(&self->mapImpl, size-1);\
+            N__##_Impl_replaceElementAt(&self->mapImpl, index, &tmp_for_removeAt);       \
         }                                                                   \
         N__##_Impl_popBack(&self->mapImpl);                                 \
     }
@@ -434,7 +435,7 @@
     int N__##_getIndexOf(N__ const* self, K__ const* key)                   \
     {                                                                       \
         int size = N__##_Impl_getSize(&self->mapImpl);                      \
-        for (int i=0; i< size; ++i)                                         \
+        for (int i=0; i< size; i++)                                         \
         {                                                                   \
             N__##_Item const* item;                                         \
             item = N__##_Impl_getPtrToElementAt(&self->mapImpl, i);         \
@@ -456,6 +457,7 @@
     }
 
 #define MapT_SETVALUEAT_IMPL(K__,V__,N__)                                   \
+    N__##_Item newItem_for_setValueAt;                                      \
     bool N__##_setValueAt(N__* self,                                        \
                            int index,                                       \
                            V__ const* newValue)                             \
@@ -463,20 +465,19 @@
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
         Debug_ASSERT(item >= 0);                                           \
-        N__##_Item newItem;                                                 \
-        if (K__##_ctorCopy(&newItem.key, &item->key))                       \
+        if (K__##_ctorCopy(&newItem_for_setValueAt.key, &item->key))      \
         {                                                                   \
-            if (V__##_ctorCopy(&newItem.value, newValue))                   \
+            if (V__##_ctorCopy(&newItem_for_setValueAt.value, newValue))    \
             {                                                               \
                 if (N__##_Impl_replaceElementAt(&self->mapImpl,             \
                                                  index,                     \
-                                                 newItem))                  \
+                                                 &newItem_for_setValueAt))  \
                 {                                                           \
                     return true;                                            \
                 }                                                           \
-                V__##_dtor(&newItem.value);                                 \
+                V__##_dtor(&newItem_for_setValueAt.value);                  \
             }                                                               \
-            K__##_dtor(&newItem.key);                                       \
+            K__##_dtor(&newItem_for_setValueAt.key);                        \
         }                                                                   \
         return false;                                                       \
     }
@@ -523,15 +524,15 @@
     }
 
 #define MapT_Item_assign_IMPL(K__,V__,N__)                                  \
+    N__##_Item tmp_for_Item_assign;                                         \
     bool N__##_Item_assign(N__##_Item* self, N__##_Item const* src)         \
     {                                                                       \
-        N__##_Item tmp;                                                     \
-        if (! N__##_Item_ctorCopy(&tmp, src))                               \
+        if (! N__##_Item_ctorCopy(&tmp_for_Item_assign, src))               \
         {                                                                   \
             return false;                                                   \
         }                                                                   \
         N__##_Item_dtor(self);                                              \
-        *self = tmp;                                                        \
+        *self = tmp_for_Item_assign;                                        \
         return true;                                                        \
     }
 
