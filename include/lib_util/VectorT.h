@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #include "lib_mem/Memory.h"
-#include "lib_debug/Debug.h"
+#include "SeosLogger.h"
 
 #include <stdbool.h>
 #include <stdlib.h>

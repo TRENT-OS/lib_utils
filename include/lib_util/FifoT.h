@@ -12,7 +12,7 @@
 #if !defined(FIFOT_H)
 #define FIFOT_H
 
-#include "lib_debug/Debug.h"
+#include "SeosLogger.h"
 
 #include <stdbool.h>
 
