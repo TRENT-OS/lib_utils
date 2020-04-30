@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 target_sources(${PROJECT_NAME}
     INTERFACE
+        "src/BitConverter.c"
         "src/CharFifo.c"
         "src/PointerVector.c"
 )
