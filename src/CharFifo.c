@@ -30,7 +30,7 @@
 static inline void
 char_dtor(char* c)
 {
-    *c = -1;
+    return;
 }
 
 static inline bool
