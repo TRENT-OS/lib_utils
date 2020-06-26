@@ -16,6 +16,7 @@ target_sources(${PROJECT_NAME}
         "src/BitConverter.c"
         "src/CharFifo.c"
         "src/PointerVector.c"
+        "src/RleCompressor.c"
 )
 
 target_include_directories(${PROJECT_NAME}
