@@ -27,8 +27,22 @@
 
 // Private functions -----------------------------------------------------------
 
+static size_t
+lenNeedsBytes(
+    const size_t len)
+{
+    /*
+     * How many bytes will we need to serialize this length value?
+     */
+
+    return (len < (1u << 6))  ? 1 :
+           (len < (1u << 14)) ? 2 :
+           (len < (1u << 22)) ? 3 : 4;
+}
+
 static uint8_t*
 lenSerializeOpt(
+    const size_t sz,
     const size_t len,
     uint8_t*     p)
 {
@@ -39,23 +53,21 @@ lenSerializeOpt(
      * used in the encoding.
      */
 
-    if (len < (1u << 6))
+    switch (sz)
     {
+    case 1:
         *(p++) = 0b00000000 |  (len & 0x3F);
-    }
-    else if (len < (1u << 14))
-    {
+        break;
+    case 2:
         *(p++) = 0b01000000 | ((len >>  8) & 0x3F);
         *(p++) =               (len >>  0) & 0xFF;
-    }
-    else if (len < (1u << 22))
-    {
+        break;
+    case 3:
         *(p++) = 0b10000000 | ((len >> 16) & 0x3F);
         *(p++) =               (len >>  8) & 0xFF;
         *(p++) =               (len >>  0) & 0xFF;
-    }
-    else
-    {
+        break;
+    default:
         *(p++) = 0b11000000 | ((len >> 24) & 0x3F);
         *(p++) =               (len >> 16) & 0xFF;
         *(p++) =               (len >>  8) & 0xFF;
@@ -110,7 +122,7 @@ compressLoop(
 {
     const uint8_t* ip = ibuf;
     uint8_t sym, *op = obuf;
-    size_t slen;
+    size_t slen, sz;
 
     while (ip < (ibuf + ilen))
     {
@@ -121,11 +133,11 @@ compressLoop(
         {
             slen++;
         }
-        // Make sure we can fit at least another symbol; we assume it can have
-        // maximum size
-        if ((op + ENCODED_SYMBOL_MAX_SIZE) < (obuf + osz))
+        // Make sure we can fit the serialized len bytes and the symbol
+        sz = lenNeedsBytes(slen);
+        if ((op + sz + 1) < (obuf + osz))
         {
-            op = lenSerializeOpt(slen, op);
+            op = lenSerializeOpt(sz, slen, op);
             *(op++) = sym;
         }
         else
