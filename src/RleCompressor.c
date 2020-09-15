@@ -28,7 +28,7 @@
 // Private functions -----------------------------------------------------------
 
 static size_t
-lenNeedsBytes(
+getLenSize(
     const size_t len)
 {
     /*
@@ -41,7 +41,7 @@ lenNeedsBytes(
 }
 
 static uint8_t*
-lenSerializeOpt(
+serializeLen(
     const size_t sz,
     const size_t len,
     uint8_t*     p)
@@ -78,7 +78,7 @@ lenSerializeOpt(
 }
 
 static uint8_t*
-lenDeserializeOpt(
+deserializeLen(
     const uint8_t* p,
     size_t*        len)
 {
@@ -113,7 +113,7 @@ lenDeserializeOpt(
 }
 
 static inline OS_Error_t
-compressLoop(
+compress(
     const size_t   ilen,
     const uint8_t* ibuf,
     const size_t   osz,
@@ -134,10 +134,10 @@ compressLoop(
             slen++;
         }
         // Make sure we can fit the serialized len bytes and the symbol
-        sz = lenNeedsBytes(slen);
+        sz = getLenSize(slen);
         if ((op + sz + 1) < (obuf + osz))
         {
-            op = lenSerializeOpt(sz, slen, op);
+            op = serializeLen(sz, slen, op);
             *(op++) = sym;
         }
         else
@@ -152,7 +152,7 @@ compressLoop(
 }
 
 static inline OS_Error_t
-decompressLoop(
+decompress(
     const size_t   ilen,
     const uint8_t* ibuf,
     const size_t   osz,
@@ -165,7 +165,7 @@ decompressLoop(
     while (ip < (ibuf + ilen))
     {
         // Read number of occurences of symbol and the symbol itself
-        ip  = lenDeserializeOpt(ip, &slen);
+        ip  = deserializeLen(ip, &slen);
         sym = *(ip++);
         // Make sure we don't exceed the expected length
         if (slen + (op - obuf) > osz)
@@ -232,8 +232,8 @@ RleCompressor_compress(
     // Write the uncompressed length
     BitConverter_putUint32LE(ilen, my_obuf + 3);
 
-    if ((err = compressLoop(ilen, ibuf, sz - HEADER_LENGTH, &my_olen,
-                            my_obuf + HEADER_LENGTH)) != OS_SUCCESS)
+    if ((err = compress(ilen, ibuf, sz - HEADER_LENGTH, &my_olen,
+                        my_obuf + HEADER_LENGTH)) != OS_SUCCESS)
     {
         *olen = 0;
         if (!osz)
@@ -300,8 +300,8 @@ RleCompressor_decompress(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = decompressLoop(ilen - HEADER_LENGTH, ibuf + HEADER_LENGTH, my_olen,
-                              my_obuf)) != OS_SUCCESS)
+    if ((err = decompress(ilen - HEADER_LENGTH, ibuf + HEADER_LENGTH, my_olen,
+                          my_obuf)) != OS_SUCCESS)
     {
         *olen = 0;
         if (!osz)
