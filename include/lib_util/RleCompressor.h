@@ -17,7 +17,12 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define RLECOMPRESSOR_MAX_INPUT_SIZE  (1u << 30)
+/**
+ * We can handle at most (2^30)-1 bits, because that is what we can encode for a
+ * single symbol (symbol lengths fields are between 8-32 bit, but we reserve 2
+ * bits per length field to indicate the length of the length field itself)
+ */
+#define RLECOMPRESSOR_MAX_INPUT_SIZE ((1ul << 30) - 1)
 
 /**
  * @brief Compress a buffer with RLE encoder
