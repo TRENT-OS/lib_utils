@@ -13,11 +13,10 @@
 #include "lib_util/BitConverter.h"
 #include "lib_util/RleCompressor.h"
 
+#include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <stdbool.h>
-#include <string.h>
 
 // The worst case length for an encoded symbol is 4 bytes for the length indicator
 // and one byte for the symbol itself
@@ -103,98 +102,72 @@ lenDeserializeOpt(
 
 static inline OS_Error_t
 compressLoop(
-    const uint8_t* ip,
-    const uint8_t* iBoundary,
-    uint8_t* op,
-    const uint8_t* oBoundary)
+    const size_t   ilen,
+    const uint8_t* ibuf,
+    const size_t   osz,
+    size_t*        olen,
+    uint8_t*       obuf)
 {
-    while (ip < iBoundary)
-    {
-        // Make sure we can fit at least another symbol; we assume it can have
-        // maximum size
-        if ((op + ENCODED_SYMBOL_MAX_SIZE) >= oBoundary)
-        {
-            return OS_ERROR_ABORTED;
-        }
+    const uint8_t* ip = ibuf;
+    uint8_t sym, *op = obuf;
+    size_t slen;
 
-        uint8_t sym = *ip;
-        size_t slen = 1;
+    while (ip < (ibuf + ilen))
+    {
+        sym  = *ip;
+        slen = 1;
         // Check how often the symbol is found in sequence
-        while (++ip < iBoundary && *ip == sym)
+        while (++ip < (ibuf + ilen) && *ip == sym)
         {
             slen++;
         }
-        op = lenSerializeOpt(slen, op);
-        *(op++) = sym;
+        // Make sure we can fit at least another symbol; we assume it can have
+        // maximum size
+        if ((op + ENCODED_SYMBOL_MAX_SIZE) < (obuf + osz))
+        {
+            op = lenSerializeOpt(slen, op);
+            *(op++) = sym;
+        }
+        else
+        {
+            return OS_ERROR_ABORTED;
+        }
     }
+
+    *olen = op - obuf;
+
     return OS_SUCCESS;
 }
 
 static inline OS_Error_t
 decompressLoop(
-    const uint8_t* ip,
-    const uint8_t* iBoundary,
-    uint8_t* op,
-    const uint8_t* oBoundary)
+    const size_t   ilen,
+    const uint8_t* ibuf,
+    const size_t   osz,
+    uint8_t*       obuf)
 {
-    const uint8_t*  obuf = op;
-    const size_t    olen = oBoundary - op;
+    const uint8_t* ip = ibuf;
+    uint8_t sym, *op = obuf;
+    size_t slen;
 
-    while (ip < iBoundary)
+    while (ip < (ibuf + ilen))
     {
-        size_t slen;
         // Read number of occurences of symbol and the symbol itself
-        ip = lenDeserializeOpt(ip, &slen);
+        ip  = lenDeserializeOpt(ip, &slen);
+        sym = *(ip++);
         // Make sure we don't exceed the expected length
-        if (slen + (op - obuf) > olen)
+        if (slen + (op - obuf) > osz)
         {
             return OS_ERROR_ABORTED;
         }
-
-        uint8_t sym = *(ip++);
         // Write symbol as often as we found it
-        while (slen-- > 0 && op < oBoundary)
+        while (slen-- > 0)
         {
             *(op++) = sym;
         }
     }
+
     return OS_SUCCESS;
-}
-
-static inline bool
-isCompressParametersOk(
-    const uint8_t* ibuf,
-    size_t*        olen,
-    uint8_t**      obuf)
-{
-    if (NULL == ibuf || NULL == olen || NULL == obuf)
-    {
-        return false;
-    }
-    return true;
-}
-
-static inline bool
-isDecompressParametersOk(
-    const size_t   ilen,
-    const uint8_t* ibuf,
-    size_t*        olen,
-    uint8_t**      obuf)
-{
-    if (NULL == ibuf || NULL == olen || NULL == obuf ||
-        ilen > RLECOMPRESSOR_MAX_INPUT_SIZE)
-    {
-        return false;
-    }
-    // Check magic header
-    static const char* headString = "RLE";
-
-    if (ilen >= strlen(headString) &&
-        memcmp(ibuf, headString, strlen(headString)))
-    {
-        return false;
-    }
-    return true;
 }
 
 // Public functions ------------------------------------------------------------
@@ -207,10 +180,15 @@ RleCompressor_compress(
     size_t*        olen,
     uint8_t**      obuf)
 {
-    uint8_t* op;
-    size_t sz;
+    OS_Error_t err;
+    size_t sz, my_olen;
+    uint8_t* my_obuf;
 
-    if (isCompressParametersOk(ibuf, olen, obuf))
+    if (NULL == obuf || NULL == ibuf || NULL == olen)
+    {
+        return OS_ERROR_INVALID_PARAMETER;
+    }
+    if (ilen > RLECOMPRESSOR_MAX_INPUT_SIZE)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -223,52 +201,46 @@ RleCompressor_compress(
         {
             return OS_ERROR_BUFFER_TOO_SMALL;
         }
+        my_obuf = *obuf;
     }
     else
     {
-        // If we did'nt get a buffer we allocate one with maximum possible size,
+        // If we didn't get a buffer we allocate one with maximum possible size,
         // i.e., every symbol is encoded into two bytes + the header. We will
         // shrink the buffer later once the final size is known
         sz = (2 * ilen) + HEADER_LENGTH;
-        if ((*obuf = malloc(sz)) == NULL)
+        if ((my_obuf = malloc(sz)) == NULL)
         {
             return OS_ERROR_INSUFFICIENT_SPACE;
         }
     }
 
-    op = *obuf;
-
     // Write some magic bytes as header
-    *(op++) = 'R';
-    *(op++) = 'L';
-    *(op++) = 'E';
-
+    memcpy(my_obuf, "RLE", 3);
     // Write the uncompressed length
-    BitConverter_putUint32LE(ilen, op);
-    op += sizeof(uint32_t);
+    BitConverter_putUint32LE(ilen, my_obuf + 3);
 
-    const uint8_t* ip           = ibuf;
-    const uint8_t* iBoundary    = ibuf + ilen;
-    const uint8_t* oBoundary    = *obuf + sz;
-    OS_Error_t err              = compressLoop(ip, iBoundary, op, oBoundary);
-    if (OS_SUCCESS != err)
+    if ((err = compressLoop(ilen, ibuf, sz - HEADER_LENGTH, &my_olen,
+                            my_obuf + HEADER_LENGTH)) != OS_SUCCESS)
     {
+        *olen = 0;
         if (!osz)
         {
-            free(*obuf);
+            free(my_obuf);
+            *obuf = NULL;
         }
-        return err;
     }
-
-    *olen = op - (*obuf);
-
-    // If we allocated a buffer, shrink it to the final size
-    if (!osz)
+    else
     {
-        *obuf = realloc(*obuf, *olen);
+        *olen = my_olen + HEADER_LENGTH;
+        if (!osz)
+        {
+            // If we allocated a buffer, shrink it to the final size
+            *obuf  = realloc(my_obuf, *olen);
+        }
     }
 
-    return OS_SUCCESS;
+    return err;
 }
 
 OS_Error_t
@@ -279,21 +251,26 @@ RleCompressor_decompress(
     size_t*        olen,
     uint8_t**      obuf)
 {
-    if (isDecompressParametersOk(ilen, ibuf, olen, obuf))
+    OS_Error_t err;
+    size_t my_olen;
+    uint8_t* my_obuf;
+
+    if (NULL == ibuf || NULL == olen || NULL == obuf)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-
     if (ilen < HEADER_LENGTH)
     {
         return OS_ERROR_BUFFER_TOO_SMALL;
     }
 
+    // Check magic header
+    if (memcmp(ibuf, "RLE", 3))
+    {
+        return OS_ERROR_INVALID_STATE;
+    }
     // Get the expected length after decompression
-    size_t      my_olen = BitConverter_getUint32LE(ibuf);
-    uint8_t*    my_obuf = NULL;
-
-    const uint8_t* ip = ibuf + sizeof(uint32_t);
+    my_olen = BitConverter_getUint32LE(ibuf + 3);
 
     // If we have given an output size, check it would fit; if the output
     // size is set to 0, that means we should allocate a buffer with the
@@ -304,28 +281,29 @@ RleCompressor_decompress(
         {
             return OS_ERROR_BUFFER_TOO_SMALL;
         }
+        my_obuf = *obuf;
     }
     else if ((my_obuf = malloc(my_olen)) == NULL)
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
+
+    if ((err = decompressLoop(ilen - HEADER_LENGTH, ibuf + HEADER_LENGTH, my_olen,
+                              my_obuf)) != OS_SUCCESS)
+    {
+        *olen = 0;
+        if (!osz)
+        {
+            free(my_obuf);
+            *obuf = NULL;
+        }
+    }
     else
     {
-        *obuf   = my_obuf;
-        *olen   = my_olen;
+        *olen = my_olen;
+        *obuf = my_obuf;
     }
 
-    const uint8_t* iBoundary    = ibuf + ilen;
-    const uint8_t* oBoundary    = *obuf + *olen;
-    OS_Error_t err              = decompressLoop(ip,
-                                                 iBoundary,
-                                                 *obuf,
-                                                 oBoundary);
-    if (err != OS_SUCCESS && !osz)
-    {
-        free(my_obuf);
-        *olen = 0;
-    }
     return err;
 }
 
