@@ -21,4 +21,7 @@ bool Pointer_assign(Pointer* dst, Pointer const* src);
 
 VectorT_DECLARE(Pointer, PointerVector, size_t);
 
+#define PointerVector_GET_SIZE_BY_CAPACITY(capacity)\
+    VectorT_GET_SIZE_BY_CAPACITY(Pointer, capacity)
+
 ///@}
