@@ -18,34 +18,34 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
-typedef uint64_t volatile  BitMap64;
-typedef uint32_t volatile  BitMap32;
-typedef uint16_t volatile  BitMap16;
-typedef uint8_t  volatile  BitMap8;
-typedef int      volatile  BitMapInt;
+typedef uint64_t volatile  Bitmap64;
+typedef uint32_t volatile  Bitmap32;
+typedef uint16_t volatile  Bitmap16;
+typedef uint8_t  volatile  Bitmap8;
+typedef int      volatile  BitmapInt;
 
-#define BitMap_ALL_SET_MASK             0xFFFFFFFFFFFFFFFF  //8 byte FF
+#define Bitmap_ALL_SET_MASK             0xFFFFFFFFFFFFFFFF  //8 byte FF
 
-#define BitMap_MASK_OF_BIT(b)           (1 << (b))
+#define Bitmap_MASK_OF_BIT(b)           (1 << (b))
 
-#define BitMap_GET_BIT(arg, bitNum)     ((arg) & BitMap_MASK_OF_BIT(bitNum))
-#define BitMap_SET_BIT(arg, bitNum)     ((arg) |=  BitMap_MASK_OF_BIT(bitNum))
-#define BitMap_CLR_BIT(arg, bitNum)     ((arg) &= ~BitMap_MASK_OF_BIT(bitNum))
-#define BitMap_FLIP_BIT(arg, bitNum)    ((arg) ^=  BitMap_MASK_OF_BIT(bitNum))
+#define Bitmap_GET_BIT(arg, bitNum)     ((arg) & Bitmap_MASK_OF_BIT(bitNum))
+#define Bitmap_SET_BIT(arg, bitNum)     ((arg) |=  Bitmap_MASK_OF_BIT(bitNum))
+#define Bitmap_CLR_BIT(arg, bitNum)     ((arg) &= ~Bitmap_MASK_OF_BIT(bitNum))
+#define Bitmap_FLIP_BIT(arg, bitNum)    ((arg) ^=  Bitmap_MASK_OF_BIT(bitNum))
 
-#define BitMap_GET_MASK(arg, mask)      ((arg) & (mask))
-#define BitMap_SET_MASK(arg, mask)      ((arg) |= (mask))
-#define BitMap_CLR_MASK(arg, mask)      ((arg) &= ~(mask))
-#define BitMap_FLIP_MASK(arg, mask)     ((arg) ^= (mask))
-#define BitMap_DIFF_MASK(arg, mask)     ((arg) ^ (mask))
+#define Bitmap_GET_MASK(arg, mask)      ((arg) & (mask))
+#define Bitmap_SET_MASK(arg, mask)      ((arg) |= (mask))
+#define Bitmap_CLR_MASK(arg, mask)      ((arg) &= ~(mask))
+#define Bitmap_FLIP_MASK(arg, mask)     ((arg) ^= (mask))
+#define Bitmap_DIFF_MASK(arg, mask)     ((arg) ^ (mask))
 
-#define BitMap_IS_EMPTY(arg)            ((arg) == 0)
-#define BitMap_CHK_ANY_FLAG(arg, mask)  (((arg) & (mask)) != 0)
-#define BitMap_CHK_ALL_FLAGS(arg, mask) (((arg) & (mask)) == (mask))
-#define BitMap_DOWN_SHIFT(arg, shift)   ((arg) >> (shift))
-#define BitMap_UP_SHIFT(arg, shift)     ((arg) << (shift))
-#define BitMap_SET_ALL(arg)             ((arg) |= (BitMap_ALL_SET_MASK))
-#define BitMap_CLEAR_ALL(arg)           ((arg) &= (~BitMap_ALL_SET_MASK))
+#define Bitmap_IS_EMPTY(arg)            ((arg) == 0)
+#define Bitmap_CHK_ANY_FLAG(arg, mask)  (((arg) & (mask)) != 0)
+#define Bitmap_CHK_ALL_FLAGS(arg, mask) (((arg) & (mask)) == (mask))
+#define Bitmap_DOWN_SHIFT(arg, shift)   ((arg) >> (shift))
+#define Bitmap_UP_SHIFT(arg, shift)     ((arg) << (shift))
+#define Bitmap_SET_ALL(arg)             ((arg) |= (Bitmap_ALL_SET_MASK))
+#define Bitmap_CLEAR_ALL(arg)           ((arg) &= (~Bitmap_ALL_SET_MASK))
 
 
 /* Exported macro ------------------------------------------------------------*/
