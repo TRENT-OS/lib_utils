@@ -34,7 +34,7 @@
  * @param ibuf (required) input buffer
  * @param osz (optional) size of output buffer, set to 0 to let function allocate
  *  correctly sized \p obuf
- * @param olen (required) lenght of compressed data in \p obuf
+ * @param olen (required) length of compressed data in \p obuf
  * @param obuf (required) pointer to output buffer
  *
  * @return an error code
@@ -63,7 +63,7 @@ RleCompressor_compress(
  * @param ibuf (required) input buffer with compressed data
  * @param osz (optional) size of output buffer, set to 0 to let function allocate
  *  correctly sized \p obuf
- * @param olen (required) lenght of compressed data in \p obuf
+ * @param olen (required) length of compressed data in \p obuf
  * @param obuf (required) pointer to output buffer
  *
  * @return an error code

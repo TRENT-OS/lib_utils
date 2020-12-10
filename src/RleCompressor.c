@@ -21,7 +21,7 @@
 // The worst case length for an encoded symbol is 4 bytes for the length indicator
 // and one byte for the symbol itself
 #define ENCODED_SYMBOL_MAX_SIZE (sizeof(uint32_t) + 1)
-// Length of header we always have, i.e., "RLE" and four lenght bytes indicating
+// Length of header we always have, i.e., "RLE" and four length bytes indicating
 // decompressed length
 #define HEADER_LENGTH (sizeof(uint32_t) + 3)
 

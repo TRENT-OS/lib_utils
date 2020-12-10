@@ -23,7 +23,7 @@ TEST(Test_RleCompressor, compress_pos)
     size_t len = 0;
 
     // Output buffer can hold ONLY the header; actual input is 0 but this should
-    // be OK, then we just get a header indicating a zero-lenght result after
+    // be OK, then we just get a header indicating a zero-length result after
     // decompression
     ASSERT_EQ(OS_SUCCESS,
               RleCompressor_compress(0, inbuf, 7, &len,  &static_buf));
