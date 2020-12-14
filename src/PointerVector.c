@@ -1,3 +1,5 @@
+/*  Copyright (C) 2020, Hensoldt Cyber GmbH */
+
 #include "lib_util/PointerVector.h"
 
 VectorT_DEFINE(Pointer, PointerVector, size_t);
