@@ -81,11 +81,3 @@ TEST(Test_CharFifo, get_and_pop)
     int size = CharFifo_getSize(&cf);
     ASSERT_EQ(size, 0);
 }
-
-
-
-int main(int argc, char* argv[])
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

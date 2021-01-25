@@ -42,6 +42,23 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 #-------------------------------------------------------------------------------
+# TESTS
+#-------------------------------------------------------------------------------
+if (BUILD_TESTING)
+    include("${TEST_MAIN_DIR}/test.cmake")
+    add_test_target(${PROJECT_NAME}
+        SOURCES
+            "test/src/Test_BitConverter.cpp"
+            "test/src/Test_CharFifo.cpp"
+            "test/src/Test_RleCompressor.cpp"
+        MOCKS
+            ext_mocks
+            lib_mem_mocks
+            lib_debug_mocks
+    )
+endif ()
+
+#-------------------------------------------------------------------------------
 # MOCKS
 #-------------------------------------------------------------------------------
 if (BUILD_TESTING)

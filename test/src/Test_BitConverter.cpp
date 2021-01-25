@@ -116,9 +116,3 @@ TEST(Test_BitConverter, toUint)
     value64 = BitConverter_getUint64(array64);
     ASSERT_TRUE(value64 == isBE ? 0x1234567890123456 : 0x5634129078563412);
 }
-
-int main(int argc, char* argv[])
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

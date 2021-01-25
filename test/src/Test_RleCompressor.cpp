@@ -129,9 +129,3 @@ TEST(Test_RleCompressor, compress_decompress)
     ASSERT_EQ(0, memcmp(static_buf, inbuf, sizeof(inbuf)));
     free(alloc_buf);
 }
-
-int main(int argc, char* argv[])
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
