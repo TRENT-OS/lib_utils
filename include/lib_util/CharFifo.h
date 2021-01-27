@@ -6,7 +6,7 @@
  *
  * @brief Fifo class of chars based on FifoT.h template
  *
- * Copyright (C) 2019, Hensoldt Cyber GmbH
+ * Copyright (C) 2019, HENSOLDT Cyber GmbH
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/

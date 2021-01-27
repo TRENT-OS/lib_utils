@@ -1,7 +1,7 @@
 /*
  *  Managed Buffer add convenience wrapper for using a memory buffer
  *
- *  Copyright (C) 2018, Hensoldt Cyber GmbH
+ *  Copyright (C) 2018, HENSOLDT Cyber GmbH
  */
 
 #pragma once

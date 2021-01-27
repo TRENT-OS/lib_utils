@@ -6,7 +6,7 @@
  *
  * @brief Simple bitmap management : Bit Index start from 0.
  *
- * Copyright (C) 2019, Hensoldt Cyber GmbH
+ * Copyright (C) 2019, HENSOLDT Cyber GmbH
  */
 
 #ifndef BITMAP_H

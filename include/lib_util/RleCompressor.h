@@ -6,7 +6,7 @@
  *
  * @brief Compress a buffer with a simple Run Length Encoder
  *
- * Copyright (C) 2020, Hensoldt Cyber GmbH
+ * Copyright (C) 2020, HENSOLDT Cyber GmbH
  *
  */
 

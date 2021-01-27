@@ -7,7 +7,7 @@
  * @brief Converts base data types to an array of bytes, and an array of bytes
  * to base data types.
  *
- * Copyright (C) 2020, Hensoldt Cyber GmbH
+ * Copyright (C) 2020, HENSOLDT Cyber GmbH
  *
  */
 

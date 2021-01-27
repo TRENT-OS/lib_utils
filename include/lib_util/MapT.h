@@ -6,7 +6,7 @@
  *
  * @brief Map container template
  *
- * Copyright (C) 2019, Hensoldt Cyber GmbH
+ * Copyright (C) 2019, HENSOLDT Cyber GmbH
  *
  */
 #if !defined(MAPT_H)

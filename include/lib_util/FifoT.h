@@ -6,7 +6,7 @@
  *
  * @brief Fifo container template
  *
- * Copyright (C) 2019, Hensoldt Cyber GmbH
+ * Copyright (C) 2019, HENSOLDT Cyber GmbH
  *
  */
 #if !defined(FIFOT_H)
