@@ -34,7 +34,7 @@ if (DEBUG_CONFIG_H_FILE)
             "DEBUG_CONFIG_H_FILE=${DEBUG_CONFIG_H_FILE}"
     )
 
-endif()
+endif ()
 
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
