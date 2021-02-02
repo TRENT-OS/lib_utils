@@ -1,5 +1,5 @@
 /**
- * @addtogroup LibUtil
+ * @addtogroup lib_utils
  * @{
  *
  * @file MapT.h

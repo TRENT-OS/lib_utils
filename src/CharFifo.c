@@ -1,6 +1,6 @@
 /*  Copyright (C) 2020, HENSOLDT Cyber GmbH */
 /**
- * @addtogroup Commons
+ * @addtogroup lib_utils
  * @{
  *
  * @file CharFifo.c
