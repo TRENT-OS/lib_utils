@@ -1,5 +1,5 @@
 #
-# The Utility Library
+# The Utilities Library
 #
 # Copyright (C) 2020, HENSOLDT Cyber GmbH
 #
@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.17)
 
 #-------------------------------------------------------------------------------
-project(lib_util C)
+project(lib_utils C)
 
 #-------------------------------------------------------------------------------
 # LIBRARY

@@ -10,7 +10,7 @@
  */
 #pragma once
 
-#include "lib_util/VectorT.h"
+#include "lib_utils/VectorT.h"
 
 typedef void* Pointer;
 

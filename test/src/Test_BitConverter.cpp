@@ -6,7 +6,7 @@
 
 extern "C"
 {
-#include "lib_util/BitConverter.h"
+#include "lib_utils/BitConverter.h"
 #include <stdint.h>
 #include <limits.h>
 }

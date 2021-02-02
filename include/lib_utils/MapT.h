@@ -12,7 +12,7 @@
 #if !defined(MAPT_H)
 #define MAPT_H
 
-#include "lib_util/VectorT.h"
+#include "lib_utils/VectorT.h"
 
 /**
  * @file

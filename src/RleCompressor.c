@@ -10,8 +10,8 @@
 
 #include "OS_Error.h"
 
-#include "lib_util/BitConverter.h"
-#include "lib_util/RleCompressor.h"
+#include "lib_utils/BitConverter.h"
+#include "lib_utils/RleCompressor.h"
 
 #include <string.h>
 #include <stdlib.h>

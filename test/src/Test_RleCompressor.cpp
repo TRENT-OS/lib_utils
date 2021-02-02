@@ -6,7 +6,7 @@
 
 extern "C"
 {
-#include "lib_util/RleCompressor.h"
+#include "lib_utils/RleCompressor.h"
 #include <stdint.h>
 #include <limits.h>
 }
