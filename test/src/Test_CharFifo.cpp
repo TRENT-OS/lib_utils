@@ -6,7 +6,7 @@
 
 extern "C"
 {
-  #include "lib_utils/CharFifo.h"
+#include "lib_utils/CharFifo.h"
 }
 
 #define FIFO_SIZE 10
