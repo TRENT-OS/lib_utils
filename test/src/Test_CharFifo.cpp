@@ -52,6 +52,7 @@ class Test_CharFifo_extendedSetUp : public Test_CharFifo
 };
 
 /*----------------------------------------------------------------------------*/
+// Verify the CharFifo constructor
 TEST_F(Test_CharFifo, construction)
 {
     ASSERT_TRUE(CharFifo_isEmpty(&cf));
@@ -61,6 +62,7 @@ TEST_F(Test_CharFifo, construction)
     ASSERT_EQ(CharFifo_getCapacity(&cf), kFifoSize);
 }
 
+// Verify that once the CharFifo is filled, only forced pushs are possible
 TEST_F(Test_CharFifo_extendedSetUp, push_out_of_limits)
 {
     char c = 0;
@@ -73,6 +75,7 @@ TEST_F(Test_CharFifo_extendedSetUp, push_out_of_limits)
     ASSERT_TRUE(CharFifo_forcedPush(&cf, &c));
 }
 
+// Pop off the stored values and verify them against the filled entries
 TEST_F(Test_CharFifo_extendedSetUp, get_and_pop)
 {
     for (unsigned int i = 0; i < kFifoSize; i++)
