@@ -28,24 +28,24 @@ TEST(Test_CharFifo, construction)
     ASSERT_TRUE(ok);
     ok = !CharFifo_isFull(&cf);
     ASSERT_TRUE(ok);
-    int size = CharFifo_getSize(&cf);
+    size_t size = CharFifo_getSize(&cf);
     ASSERT_EQ(size, 0);
-    char const* first = CharFifo_getFirst(&cf);
+    const char* first = CharFifo_getFirst(&cf);
     ASSERT_TRUE(first == NULL);
-    int capacity = CharFifo_getCapacity(&cf);
+    size_t capacity = CharFifo_getCapacity(&cf);
     ASSERT_EQ(FIFO_SIZE, capacity);
 }
 
 TEST(Test_CharFifo, push_within_limits)
 {
-    for (int i = 0; i < FIFO_SIZE; i++)
+    for (unsigned int i = 0; i < FIFO_SIZE; i++)
     {
         char c = (char) i;
         bool ok = CharFifo_push(&cf, &c);
         ASSERT_TRUE(ok);
         ok = !CharFifo_isEmpty(&cf);
         ASSERT_TRUE(ok);
-        int size = CharFifo_getSize(&cf);
+        size_t size = CharFifo_getSize(&cf);
         ASSERT_EQ(size, i + 1);
     }
 }
@@ -58,7 +58,7 @@ TEST(Test_CharFifo, push_out_of_limits)
     ASSERT_TRUE(ok);
     ok = CharFifo_isFull(&cf);
     ASSERT_TRUE(ok);
-    int size = CharFifo_getSize(&cf);
+    size_t size = CharFifo_getSize(&cf);
     ASSERT_EQ(FIFO_SIZE, size);
     char c = (char) size;
     ok = CharFifo_forcedPush(&cf, &c);
@@ -67,17 +67,17 @@ TEST(Test_CharFifo, push_out_of_limits)
 
 TEST(Test_CharFifo, get_and_pop)
 {
-    for (int i = 0; i < FIFO_SIZE; i++)
+    for (unsigned int i = 0; i < FIFO_SIZE; i++)
     {
         char c = CharFifo_getAndPop(&cf);
         ASSERT_EQ(c, i + 1);
-        int size = CharFifo_getSize(&cf);
+        size_t size = CharFifo_getSize(&cf);
         ASSERT_EQ(size, FIFO_SIZE - (i + 1));
         bool ok = !CharFifo_isFull(&cf);
         ASSERT_TRUE(ok);
     }
     bool ok = CharFifo_isEmpty(&cf);
     ASSERT_TRUE(ok);
-    int size = CharFifo_getSize(&cf);
+    size_t size = CharFifo_getSize(&cf);
     ASSERT_EQ(size, 0);
 }
