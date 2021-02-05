@@ -10,7 +10,6 @@ extern "C"
 }
 
 constexpr unsigned int kFifoSize = 10;
-const char c = 0;
 
 class Test_CharFifo : public testing::Test
 {
@@ -58,6 +57,7 @@ TEST_F(Test_CharFifo, push_within_limits)
 
 TEST_F(Test_CharFifo, push_out_of_limits)
 {
+    char c = 0;
     bool ok = !CharFifo_push(&cf, &c);
     ASSERT_TRUE(ok);
     ok = !CharFifo_isEmpty(&cf);
@@ -66,7 +66,7 @@ TEST_F(Test_CharFifo, push_out_of_limits)
     ASSERT_TRUE(ok);
     size_t size = CharFifo_getSize(&cf);
     ASSERT_EQ(kFifoSize, size);
-    char c = (char) size;
+    c = (char) size;
     ok = CharFifo_forcedPush(&cf, &c);
     ASSERT_TRUE(ok);
 }
