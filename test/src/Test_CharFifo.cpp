@@ -11,6 +11,7 @@ extern "C"
 
 constexpr unsigned int kFifoSize = 10;
 
+/*----------------------------------------------------------------------------*/
 static void fillFifo(CharFifo* self, const size_t fifoSize)
 {
     for (unsigned int i = 0; i < fifoSize; i++)
@@ -50,6 +51,7 @@ class Test_CharFifo_extendedSetUp : public Test_CharFifo
         }
 };
 
+/*----------------------------------------------------------------------------*/
 TEST_F(Test_CharFifo, construction)
 {
     ASSERT_TRUE(CharFifo_isEmpty(&cf));
