@@ -52,47 +52,36 @@ class Test_CharFifo_extendedSetUp : public Test_CharFifo
 
 TEST_F(Test_CharFifo, construction)
 {
-    bool ok = CharFifo_isEmpty(&cf);
-    ASSERT_TRUE(ok);
-    ok = !CharFifo_isFull(&cf);
-    ASSERT_TRUE(ok);
-    size_t size = CharFifo_getSize(&cf);
-    ASSERT_EQ(size, 0);
-    const char* first = CharFifo_getFirst(&cf);
-    ASSERT_TRUE(first == NULL);
-    size_t capacity = CharFifo_getCapacity(&cf);
-    ASSERT_EQ(kFifoSize, capacity);
+    ASSERT_TRUE(CharFifo_isEmpty(&cf));
+    ASSERT_FALSE(CharFifo_isFull(&cf));
+    ASSERT_EQ(CharFifo_getSize(&cf), 0);
+    ASSERT_TRUE(CharFifo_getFirst(&cf) == NULL);
+    ASSERT_EQ(CharFifo_getCapacity(&cf), kFifoSize);
 }
 
 TEST_F(Test_CharFifo_extendedSetUp, push_out_of_limits)
 {
     char c = 0;
-    bool ok = !CharFifo_push(&cf, &c);
-    ASSERT_TRUE(ok);
-    ok = !CharFifo_isEmpty(&cf);
-    ASSERT_TRUE(ok);
-    ok = CharFifo_isFull(&cf);
-    ASSERT_TRUE(ok);
+    ASSERT_FALSE(CharFifo_push(&cf, &c));
+    ASSERT_FALSE(CharFifo_isEmpty(&cf));
+    ASSERT_TRUE(CharFifo_isFull(&cf));
     size_t size = CharFifo_getSize(&cf);
     ASSERT_EQ(kFifoSize, size);
     c = (char) size;
-    ok = CharFifo_forcedPush(&cf, &c);
-    ASSERT_TRUE(ok);
+    ASSERT_TRUE(CharFifo_forcedPush(&cf, &c));
 }
 
 TEST_F(Test_CharFifo_extendedSetUp, get_and_pop)
 {
     for (unsigned int i = 0; i < kFifoSize; i++)
     {
-        char c = CharFifo_getAndPop(&cf);
-        ASSERT_EQ(c, i);
-        size_t size = CharFifo_getSize(&cf);
-        ASSERT_EQ(size, kFifoSize - (i + 1));
-        bool ok = !CharFifo_isFull(&cf);
-        ASSERT_TRUE(ok);
+        size_t size_pre = CharFifo_getSize(&cf);
+        ASSERT_EQ(size_pre, kFifoSize - i);
+        ASSERT_EQ(CharFifo_getAndPop(&cf), i);
+        size_t size_post = CharFifo_getSize(&cf);
+        ASSERT_EQ(size_post, size_pre - 1);
+        ASSERT_FALSE(CharFifo_isFull(&cf));
     }
-    bool ok = CharFifo_isEmpty(&cf);
-    ASSERT_TRUE(ok);
-    size_t size = CharFifo_getSize(&cf);
-    ASSERT_EQ(size, 0);
+    ASSERT_TRUE(CharFifo_isEmpty(&cf));
+    ASSERT_EQ(CharFifo_getSize(&cf), 0);
 }
