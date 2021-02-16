@@ -42,38 +42,9 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 #-------------------------------------------------------------------------------
-# TESTS
+# TESTING
 #-------------------------------------------------------------------------------
 if (BUILD_TESTING)
-    include("${TEST_MAIN_DIR}/test.cmake")
-    add_test_target(${PROJECT_NAME}
-        SOURCES
-            "test/src/Test_BitConverter.cpp"
-            "test/src/Test_CharFifo.cpp"
-            "test/src/Test_RleCompressor.cpp"
-        MOCKS
-            ext_mocks
-            lib_mem_mocks
-            lib_debug_mocks
-    )
-endif ()
-
-#-------------------------------------------------------------------------------
-# MOCKS
-#-------------------------------------------------------------------------------
-if (BUILD_TESTING)
-    add_library("${PROJECT_NAME}_mocks"
-        "src/PointerVector.c" # TODO Write a real mock.
-    )
-
-    target_include_directories("${PROJECT_NAME}_mocks"
-        PUBLIC
-            "include"
-    )
-
-    target_link_libraries("${PROJECT_NAME}_mocks"
-        PUBLIC
-            lib_debug_mocks
-            lib_mem_mocks
-    )
+    add_subdirectory(test)
+    add_subdirectory(mocks)
 endif ()
