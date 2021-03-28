@@ -12,6 +12,7 @@
 #if !defined(FIFOT_H)
 #define FIFOT_H
 
+#include "lib_compiler/compiler.h"
 #include "lib_debug/Debug.h"
 
 #include <stdbool.h>
@@ -293,13 +294,12 @@ N__##_getCapacity(N__ const* self)                                          \
 bool                                                                        \
 N__##_push(N__* self, T__ const* item)                                      \
 {                                                                           \
-    bool ok = false;                                                        \
-                                                                            \
     if (N__##_isFull(self))                                                 \
     {                                                                       \
         return false;                                                       \
     }                                                                       \
-    ok = T__##_ctorCopy(&self->fifo[ self->last ], item);                   \
+    DECL_UNUSED_VAR(const bool ok) =                                        \
+        T__##_ctorCopy(&self->fifo[ self->last ], item);                    \
     Debug_ASSERT(ok);                                                       \
                                                                             \
     self->last = (self->last + 1) % self->capacity;                         \

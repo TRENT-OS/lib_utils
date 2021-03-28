@@ -15,6 +15,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 
+#include "lib_compiler/compiler.h"
 #include "lib_utils/CharFifo.h"
 
 
@@ -50,7 +51,7 @@ FifoT_DEFINE(char, CharFifo, size_t)
 bool
 CharFifo_forcedPush(CharFifo* self, char const* c)
 {
-    bool ok = false, retval = false;
+    bool retval = false;
 
     if (CharFifo_isFull(self))
     {
@@ -59,7 +60,7 @@ CharFifo_forcedPush(CharFifo* self, char const* c)
     }
     else { /* do nothing */ }
 
-    ok = CharFifo_push(self, c);
+    DECL_UNUSED_VAR(const bool ok) = CharFifo_push(self, c);
     Debug_ASSERT(ok);
 
     return retval;
@@ -69,7 +70,7 @@ char
 CharFifo_getAndPop(CharFifo* self)
 {
     char c = * CharFifo_getFirst(self);
-    bool ok = CharFifo_pop(self);
+    DECL_UNUSED_VAR(const bool ok) = CharFifo_pop(self);
     Debug_ASSERT(ok);
 
     return c;
