@@ -1,5 +1,5 @@
 #
-# The Utilities Library
+# Utilities Library
 #
 # Copyright (C) 2020, HENSOLDT Cyber GmbH
 #

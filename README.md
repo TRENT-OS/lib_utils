@@ -1,4 +1,4 @@
-# The Utilities Library
+# Utilities Library
 
-This repository consists of the common useful utilities that are hard to be
-categorized differently.
+The library provides useful utilities that do not fit in any another specific
+library.
