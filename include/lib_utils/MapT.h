@@ -80,8 +80,7 @@
  *       functions).
  */
 
-#define MapT_GET_SIZE_BY_CAPACITY(T__, numItems)                         \
-    (sizeof(N__##_Item) * numItems)
+#define MapT_SIZE_OF_BUFFER(N__, numItems)  (sizeof(N__##_Item) * numItems)
 
 /**
  * @fn bool MapT_ctor(MapT* self, size_t capacity)
