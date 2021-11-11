@@ -12,7 +12,9 @@
 
 #include "lib_utils/VectorT.h"
 
-typedef void* Pointer;
+#include <stdint.h>
+
+typedef intptr_t Pointer;
 
 void Pointer_dtor(Pointer* el);
 bool Pointer_ctorCopy(Pointer* dst, Pointer const* src);
