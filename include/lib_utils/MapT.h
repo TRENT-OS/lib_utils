@@ -392,8 +392,7 @@
         N__##_Item item;                                                    \
         K__##_ctorCopy(&item.key, key);                                     \
         V__##_ctorCopy(&item.value, value);                                 \
-        N__##_Impl_pushBack(&self->mapImpl, item);                          \
-        return true;                                                        \
+        return N__##_Impl_pushBack(&self->mapImpl, item);                   \
     }
 
 #define MapT_REMOVEAT_IMPL(K__,V__,N__)                                     \
