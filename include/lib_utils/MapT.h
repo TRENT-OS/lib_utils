@@ -93,7 +93,7 @@
  * on such object.
  *
  * @param self a pointer to the object to construct.
- * @param capacity initialy capacity, dinamically mutable
+ * @param capacity initially capacity, dynamically mutable
  * @retval true the construction performed correctly.
  * @retval false the construction failed.
  */
@@ -111,7 +111,7 @@
  *
  * @param self a pointer to the object to construct.
  * @param buffer memory buffer .
- * @param capacity initialy capacity, dinamically mutable
+ * @param capacity static capacity, non mutable.
  * @retval true the construction performed correctly.
  * @retval false the construction failed.
  */
@@ -122,11 +122,11 @@
  * @fn bool MapT_ctorCopy(MapT* self)
  *
  * Container copy constructor. This method is similar to the constructor, but
- * on successful return the constructed object is initialized with values
+ * on successful return the constructed object is initialised with values
  * copied from the given container.
  *
  * @param self a pointer to the object to construct.
- * @param a the container to use for initialization.
+ * @param a the container to use for initialisation.
  * @retval true the construction performed correctly.
  * @retval false the construction failed.
  */
@@ -362,13 +362,13 @@
 
 #define MapT_CTOR_STATIC_IMPL(K__,V__,N__)                                  \
     bool                                                                    \
-    N__##_ctorStatic(N__* self, void* buffer, size_t capacity)                    \
+    N__##_ctorStatic(N__* self, void* buffer, size_t capacity)              \
     {                                                                       \
         return N__##_Impl_ctorStatic(&self->mapImpl, buffer, capacity);     \
     }
 
 #define MapT_CTOR_COPY_IMPL(K__,V__,N__)                                    \
-	bool								    \
+    bool								    \
     N__##_ctorCopy(N__* self, N__ const* a)                                 \
     {									    \
 	    return N__##_Impl_ctorCopy(&self->mapImpl, &a->mapImpl);        \
@@ -400,9 +400,9 @@
 #define MapT_REMOVEAT_IMPL(K__,V__,N__)                                     \
     void N__##_removeAt(N__* self, int index)                               \
     {                                                                       \
-        Debug_ASSERT(index >= 0);                                          \
+        Debug_ASSERT(index >= 0);                                           \
         int size = N__##_Impl_getSize(&self->mapImpl);                      \
-        Debug_ASSERT(index < size);                                        \
+        Debug_ASSERT(index < size);                                         \
         if (index !=  size-1)                                               \
         {                                                                   \
             N__##_Item tmp = N__##_Impl_getElementAt(&self->mapImpl, size-1);\
@@ -451,7 +451,7 @@
     {                                                                       \
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
-        Debug_ASSERT(item >= 0);                                           \
+        Debug_ASSERT(item >= 0);                                            \
         return &item->value;                                                \
     }
 
@@ -462,7 +462,7 @@
     {                                                                       \
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
-        Debug_ASSERT(item >= 0);                                           \
+        Debug_ASSERT(item >= 0);                                            \
         N__##_Item newItem;                                                 \
         if (K__##_ctorCopy(&newItem.key, &item->key))                       \
         {                                                                   \
@@ -484,7 +484,7 @@
 #define MapT_GETKEYAT_IMPL(K__, V__, N__)                                   \
     K__ const* N__##_getKeyAt(N__ const* self, int index)                   \
     {                                                                       \
-        Debug_ASSERT(index >= 0);                                          \
+        Debug_ASSERT(index >= 0);                                           \
         N__##_Item const* item;                                             \
         item = N__##_Impl_getPtrToElementAt(&self->mapImpl, index);         \
         return &item->key;                                                  \
