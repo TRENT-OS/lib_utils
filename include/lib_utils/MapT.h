@@ -523,14 +523,8 @@
 #define MapT_Item_assign_IMPL(K__,V__,N__)                                  \
     bool N__##_Item_assign(N__##_Item* self, N__##_Item const* src)         \
     {                                                                       \
-        N__##_Item tmp;                                                     \
-        if (! N__##_Item_ctorCopy(&tmp, src))                               \
-        {                                                                   \
-            return false;                                                   \
-        }                                                                   \
-        N__##_Item_dtor(self);                                              \
-        *self = tmp;                                                        \
-        return true;                                                        \
+        return K__##_assign(&self->key, &src->key) &&                       \
+                V__##_assign(&self->value, &src->value);                    \
     }
 
 #define MapT_Item_ctorMove_IMPL(K__,V__,N__)                                \
