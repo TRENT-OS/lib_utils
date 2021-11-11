@@ -20,6 +20,7 @@ void Pointer_dtor(Pointer* el);
 bool Pointer_ctorCopy(Pointer* dst, Pointer const* src);
 bool Pointer_ctorMove(Pointer* dst, Pointer const* src);
 bool Pointer_assign(Pointer* dst, Pointer const* src);
+bool Pointer_isEqual(Pointer const * a, Pointer const * b);
 
 VectorT_DECLARE(Pointer, PointerVector, size_t);
 

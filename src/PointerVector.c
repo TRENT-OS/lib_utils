@@ -28,3 +28,9 @@ Pointer_ctorMove(Pointer* dst, Pointer const* src)
 {
     return Pointer_assign(dst, src);
 }
+
+bool
+Pointer_isEqual(Pointer const* a, Pointer const* b)
+{
+    return (*a == *b);
+}
