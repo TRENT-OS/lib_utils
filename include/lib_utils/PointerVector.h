@@ -24,7 +24,7 @@ bool Pointer_isEqual(Pointer const * a, Pointer const * b);
 
 VectorT_DECLARE(Pointer, PointerVector, size_t);
 
-#define PointerVector_GET_SIZE_BY_CAPACITY(capacity)\
-    VectorT_GET_SIZE_BY_CAPACITY(Pointer, capacity)
+#define PointerVector_SIZE_OF_BUFFER(numItems)\
+    VectorT_SIZE_OF_BUFFER(Pointer, numItems)
 
 ///@}

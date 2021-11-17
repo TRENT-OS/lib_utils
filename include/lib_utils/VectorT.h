@@ -242,8 +242,7 @@ bool N##_resizeIfNeeded(N* v)
  * @param v a pointer to the vector.
  */
 
-#define VectorT_GET_SIZE_BY_CAPACITY(T__, numItems)                         \
-    (sizeof(T__) * numItems)
+#define VectorT_SIZE_OF_BUFFER(T__, numItems)   (sizeof(T__) * numItems)
 
 #define VectorT_ASSERTInvariants(T__, N__, V__, SIZE_T)                     \
     do                                                                      \
