@@ -3,6 +3,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <thread>
 
 extern "C"
 {
@@ -89,4 +90,125 @@ TEST_F(Test_CharFifo_extendedSetUp, get_and_pop)
     }
     ASSERT_TRUE(CharFifo_isEmpty(&cf));
     ASSERT_EQ(CharFifo_getSize(&cf), 0);
+}
+
+
+TEST_F(Test_CharFifo_extendedSetUp, head_chases_tail_concurrently)
+{
+    EXPECT_TRUE(CharFifo_isFull(&cf));
+
+    // An arbitrary value that is big enough to cause multiple rounds of the
+    // ring buffer and consumer/producer collisions at different places of the
+    // ring buffer.
+    const size_t iterations = 4096;
+
+    std::thread producer
+    {[this]
+        {
+            for(size_t i = kFifoSize; i < iterations; i++)
+            {
+                if(!CharFifo_push(&cf, (const char*) &i))
+                {
+                    // As producer and consumer running in parallel on the same
+                    // priority to detect issues. If yield is not used, one of
+                    // them will get all the computing time. And the other will
+                    // starve. Yield is a pragmatic way to ensure computing time
+                    // is shared.
+                    std::this_thread::yield();
+                    --i;
+                }
+            }
+        }
+    };
+
+    std::thread consumer
+    {[this]
+        {
+            for(size_t i = 0; i < iterations; i++)
+            {
+                char item;
+
+                if(!CharFifo_isEmpty(&cf))
+                {
+                    ASSERT_EQ((char)i, CharFifo_getAndPop(&cf));
+                }
+                else
+                {
+                    // As producer and consumer running in parallel on the same
+                    // priority to detect issues. If yield is not used, one of
+                    // them will get all the computing time. And the other will
+                    // starve. Yield is a pragmatic way to ensure computing time
+                    // is shared.
+                    std::this_thread::yield();
+                    --i;
+                }
+            }
+        }
+    };
+
+    producer.join();
+    consumer.join();
+
+    EXPECT_TRUE(CharFifo_isEmpty(&cf))
+        << CharFifo_getSize(&cf);
+}
+
+TEST_F(Test_CharFifo, tail_chases_head_concurrently)
+{
+    EXPECT_TRUE(CharFifo_isEmpty(&cf));
+
+    // An arbitrary value that is big enough to cause multiple rounds of the
+    // ring buffer and consumer/producer collisions at different places of the
+    // ring buffer.
+    const size_t iterations = 4096;
+
+    std::thread producer
+    {[this]
+        {
+            for(size_t i = 0; i < iterations; i++)
+            {
+                if(!CharFifo_push(&cf, (const char*) &i))
+                {
+                    // As producer and consumer running in parallel on the same
+                    // priority to detect issues. If yield is not used, one of
+                    // them will get all the computing time. And the other will
+                    // starve. Yield is a pragmatic way to ensure computing time
+                    // is shared.
+                    std::this_thread::yield();
+                    --i;
+                }
+            }
+        }
+    };
+
+    std::thread consumer
+    {[this]
+        {
+            for(size_t i = 0; i < iterations; i++)
+            {
+                char item;
+
+                if(!CharFifo_isEmpty(&cf))
+                {
+                    ASSERT_EQ((char)i, CharFifo_getAndPop(&cf));
+                }
+                else
+                {
+                    // As producer and consumer running in parallel on the same
+                    // priority to detect issues. If yield is not used, one of
+                    // them will get all the computing time. And the other will
+                    // starve. Yield is a pragmatic way to ensure computing time
+                    // is shared.
+                    std::this_thread::yield();
+                    --i;
+                }
+            }
+        }
+    };
+
+    producer.join();
+    consumer.join();
+
+    EXPECT_TRUE(CharFifo_isEmpty(&cf))
+        << CharFifo_getSize(&cf);
 }
