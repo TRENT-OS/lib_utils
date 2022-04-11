@@ -17,23 +17,27 @@ bool do_buffers_overlap(
     const void* buffer2,
     size_t buffer2Len)
 {
-    if (buffer1 == buffer2)
+    const void* buffer1End = (const void*)( (uintptr_t)buffer1 + buffer1Len);
+    // cap buffer at end in case of overflow
+    if (buffer1End < buffer1)
     {
-        return true;
+        buffer1End = (const void*)(-1);
     }
 
-    if (buffer1 < buffer2 && buffer1 + buffer1Len > buffer2)
+    const void* buffer2End = (const void*)( (uintptr_t)buffer2 + buffer2Len);
+    // cap buffer at end in case of overflow
+    if (buffer2End < buffer2)
     {
-        return true;
+        // overflow, cap buffer at end
+        buffer2End = (const void*)(-1);
     }
 
-    if (buffer2 < buffer1 && buffer2 + buffer2Len > buffer1)
-    {
-        return true;
-    }
-
-    return false;
+    // if they do not overlap then buffer1 is either before or after buffer2,
+    // which is (!((buffer1End <= buffer2) || (buffer2End <= buffer1))))
+    // which is logically qeual to the expression below
+    return (buffer1End > buffer2) && (buffer2End > buffer1);
 }
+
 
 //------------------------------------------------------------------------------
 static __attribute__((__unused__))
