@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2020-2024, HENSOLDT Cyber GmbH
+ * 
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * For commercial licensing, contact: info.cyber@hensoldt.net
+ */
+
 /**
  * @addtogroup lib_utils
  * @{
@@ -6,9 +14,6 @@
  *
  * @brief Converts base data types to an array of bytes, and an array of bytes
  * to base data types.
- *
- * Copyright (C) 2020, HENSOLDT Cyber GmbH
- *
  */
 
 #pragma once

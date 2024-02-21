@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2020-2024, HENSOLDT Cyber GmbH
+ * 
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * For commercial licensing, contact: info.cyber@hensoldt.net
+ */
+
 /**
  * @addtogroup lib_utils
  * @{
@@ -5,9 +13,6 @@
  * @file RleCompressor.h
  *
  * @brief Compress a buffer with a simple Run Length Encoder
- *
- * Copyright (C) 2020, HENSOLDT Cyber GmbH
- *
  */
 
 #pragma once

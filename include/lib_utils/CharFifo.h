@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2019-2024, HENSOLDT Cyber GmbH
+ * 
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * For commercial licensing, contact: info.cyber@hensoldt.net
+ */
+
 /**
  * @addtogroup lib_utils
  * @{
@@ -5,8 +13,6 @@
  * @file CharFifo.h
  *
  * @brief Fifo class of chars based on FifoT.h template
- *
- * Copyright (C) 2019, HENSOLDT Cyber GmbH
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
